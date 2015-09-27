@@ -6,6 +6,7 @@
 #define ZBASE_PF_BUFFERMANAGER_H
 
 #include "PF.h"
+#include "PF_HashTable.h"
 #include <vector>
 #include <list>
 

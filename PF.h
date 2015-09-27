@@ -74,6 +74,8 @@ public:
 
 private:
 
+    bool IsValidPageNum(PageNum pageNum) const;
+
     PF_BufferManager *bufferManager;
     PF_FileHeader header;
     bool fileOpen;
@@ -83,14 +85,19 @@ private:
 };
 
 class PF_PageHandle {
+    friend class PF_FileHandle;
 public:
     PF_PageHandle();
     ~PF_PageHandle();
     PF_PageHandle(const PF_PageHandle &pageHandle);
     PF_PageHandle& operator= (const PF_PageHandle &pageHandle);
 
-    RC GetData(char *&pData) const;
+    RC GetData(char *&data) const;
     RC GetPageNum(PageNum &pageNum) const;
+
+private:
+    int pageNum;
+    char *pageData;
 };
 
 // Warning
@@ -107,8 +114,8 @@ const RC PF_HASH_NOT_FOUND = PF_RC + 2;
 const RC PF_PAGE_IN_BUFFER = PF_RC + 3;
 const RC PF_NO_BUFFER = PF_RC + 4;
 const RC PF_READ_ERROR = PF_RC + 5;
-const RC PF_WRITE_ERROR = PF_RC + 5;
-
+const RC PF_WRITE_ERROR = PF_RC + 6;
+const RC PF_HASH_PAGE_EXIST = PF_RC + 7;
 
 
 #endif //ZBASE_PF_H

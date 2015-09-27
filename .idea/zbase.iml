@@ -6,8 +6,14 @@
       <sourceFolder url="file://$MODULE_DIR$/PF.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/PF_BufferManager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/PF_BufferManager.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_FileHandle.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_FileHandle.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_HashTable.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_HashTable.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/PF_Manager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/PF_Manager.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_PageHandle.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PF_PageHandle.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/zbase.h" isTestSource="false" />
     </content>

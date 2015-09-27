@@ -34,7 +34,6 @@ PF_BufferManager::~PF_BufferManager() {
 RC PF_BufferManager::GetPage(int fd, PageNum pageNum, char *&buffer, bool multiplePins) {
     RC rc;
     int slot;
-
     if (((rc = hashTable.Find(fd, pageNum, slot)) != 0) && (rc != PF_HASH_NOT_FOUND)) {
         return rc;
     }
@@ -233,3 +232,12 @@ RC PF_BufferManager::WritePage(int fd, PageNum pageNum, char *source) {
         return RC_OK;
     }
 }
+
+RC PF_BufferManager::InitPageDesc(int fd, PageNum pageNum, int slot) {
+    bufTable[slot].fd = fd;
+    bufTable[slot].pageNum = pageNum;
+    bufTable[slot].pinCount = 1;
+    bufTable[slot].dirty = false;
+    return RC_OK;
+}
+
