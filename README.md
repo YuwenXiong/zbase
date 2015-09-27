@@ -38,6 +38,13 @@ optional:
 
 ## Work
 
+### work wait to allocate
+- Record Manager
+- Index Manager
+- Catalog Manager
+- Unit test (dirty)
+- Test case (dirty)
+
 ### xyw
 - Interpreter
 - API
