@@ -42,6 +42,7 @@ optional:
 
 - Unit test (dirty)
 - Test case (dirty)
+- Catalog Manager
 
 ### xyw
 - Interpreter
@@ -51,5 +52,6 @@ optional:
 ### zax
 - Record Manager
 - Index Manager
-- Catalog Manager
+
+
 ### dqm
