@@ -36,7 +36,7 @@ public:
 				 vector<Condition> conditions);
 	RC Update (string relationName,
 				 RelationAttr &updateAttr,
-				 bool isValue, // true if right-hand side is a value
+				 bool isValue, // true if right-hand side is a value
 				 RelationAttr &rAttr,
 				 Value &rValue,
 				 vector<Condition> conditions);
