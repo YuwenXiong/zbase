@@ -135,7 +135,87 @@ public:
 
 
 ## Index Manager
+~~~cpp
+class IX_Manager {
+public:
+	IX_Manager(PF_Manager &pfm);
+	~IX_Manager();
+	RC CreateIndex(const string &fileName,
+				   int indexNo,
+				   AttrType attrType,
+				   int attrLength);
+	RC DestoryIndex(const string &fileName,
+					int indexNo);
+	RC OpenIndex(const string &fileName,
+				 int indexNo,
+				 IX_IndexHandle &indexHandle);
+	RC CloseIndex(IX_IndexHandle &indexHandle);
+};
 
+class IX_IndexHandle {
+public:
+	IX_IndexHandle();
+	~IX_IndexHandle();
+	RC InsertEntry(void *Data, const RID &rid);
+	RC DeleteEntry(void *data, const RID &rid);
+	RC ForcePages();
+};
+
+class IX_IndexScan {
+public:
+	IX_IndexScan();
+	~IX_IndexScan();
+	RC OpenScan(const IX_IndexHandle &indexHandle,
+				CmpOp, op,
+				void *value);
+	RC GetNextEntry(RID &rid);
+	RC CloseScan();
+};
+~~~
 
 ## Buffer Manager
+~~~cpp
+class PF_Manager {
+public:
+	PF_Manager();
+	~PF_Manager();
+	RC CreateFile(const string &fileName);
+	RC DestoryFile(const string &fileName);
+	RC OpenFile(const char &fileName, PF_FileHandle &fileHandle);
+	RC CloseFile(PF_FileHandle &fileHandle);
+	RC AllocateBlock(char *&buffer);
+	RC DisposeBlock(char *buffer);
+};
 
+class PF_FileHandle {
+public:
+	PF_FileHandle();
+	~PF_FileHandle();
+	PF_FileHandle(const PF_FileHandle &fileHandle);
+	PF_FileHandle& operator= (const PF_FileHandle &fileHandle);
+	
+	RC GetFirstPage(PF_PageHandle &pageHandle) const;
+	RC GetLastPage(PF_PageHandle &pageHandle) const;
+	RC GetNextPage(PageNum current, PF_PageHandle &pageHandle) const;
+	RC GetPrevPage(PageNum current, PF_PageHandle &pageHandle) const;
+	RC GetThisPage(PageNum pageNum, PF_PageHandle &pageHandle) const;
+	
+	RC AllocatePage(PF_PageHandle &pageHandle);
+	RC DisposePage(PageNum pageNum);
+	RC MarkDirty(PageNum pageNum) const;
+	RC UnpinPage(PageNum pageNum) const;
+	RC ForcePages(PageNum pageNum = ALL_PAGES) const;
+};
+
+class PF_PageHandle {
+public:
+	PF_PageHandle();
+	~PF_PageHandle();
+	PF_PageHandle(const PF_PageHandle &pageHandle);
+	PF_PageHandle& operator=(const PF_PageHandle &pageHandle);
+	
+	RC GetData(char *&data) const;
+	RC GetPageNum(PageNum &pageNum) const;
+};
+
+~~~
