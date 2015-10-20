@@ -1,10 +1,17 @@
 # Interface Conventiions
 
-## Interpreter
-
-## API
-
+## base type
 ~~~cpp
+enum AttrType {
+    INT,
+    FLOAT,
+    CHARN
+};
+
+enum CmpOp {
+	EQ, NE
+};
+
 struct RelationAttr {
 	string relationName;
 	string attrName;
@@ -29,7 +36,14 @@ struct AttrInfo {
 	int attrLength;
 };
 
-struct DataAttrInfo {
+struct RelationCatRecord {
+	string relationName;
+	int tupleLength;	// byte size of tuple, used by Record Manager
+	int attrCount;
+	int indexCount;
+};
+
+struct AttrCatRecord {
 	string relationName;
 	string attrName;
 	int offset;
@@ -37,6 +51,16 @@ struct DataAttrInfo {
 	int attrLength;
 	int indexNo;
 };
+
+typedef int RC; // return codes
+
+~~~
+
+## Interpreter
+
+## API
+
+~~~cpp
 
 class QL_Manager {
 public:
@@ -56,7 +80,13 @@ public:
 			   const Value &rValue,
 			   const vector<Condition> &conditions);
 };
+~~~
 
+
+## Catalog Manager
+~~~cpp
+// catalog manager should create a special relation to store metadata when create a database
+// this job will be done outside the class
 class SM_Manager {
 public:
 	SM_Manager(IX_Manager &ixm, RM_Manager &rmm);
@@ -64,18 +94,19 @@ public:
 	RC OpenDb(const string &dbName);
 	RC CloseDb();
 	RC CreateTable(const string &relationName, 
-				   const vector<AttrInfo> &attrs);
+				   const vector<AttrInfo> &attrs);
 	RC DropTable(const string &relationName);
 	RC CreateIndex(const string &relationName,
 				   const string &attrName);
-	RC DropIndex(const string &relationName,
-				 const string &attrName);
+	RC DropIndex(const string &relationName,
+				 const string &attrName);
+				 
+	RC GetAttrInfo(const string &relationName, int attrCount, DataAttrInfo &attrData);
+	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData);
+	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData);
 }
 
 ~~~
-
-
-## Catalog Manager
 
 ## Record Manager
 ~~~cpp
