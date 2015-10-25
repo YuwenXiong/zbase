@@ -12,7 +12,7 @@ PF_HashTable::PF_HashTable(int _numBuckets) {
 PF_HashTable::~PF_HashTable() {
 }
 
-RC PF_HashTable::Find(int fd, PageNum pageNum, int &slot) {
+RC PF_HashTable::Find(uintptr_t fd, PageNum pageNum, int &slot) {
     int bucket = Hash(fd, pageNum);
 
     if (bucket < 0) {
@@ -28,7 +28,7 @@ RC PF_HashTable::Find(int fd, PageNum pageNum, int &slot) {
     return PF_HASH_NOT_FOUND;
 }
 
-RC PF_HashTable::Insert(int fd, PageNum pageNum, int slot) {
+RC PF_HashTable::Insert(uintptr_t fd, PageNum pageNum, int slot) {
     int bucket = Hash(fd, pageNum);
     for (const auto &entry: hashTable[bucket]) {
         if (entry.fd == fd && entry.pageNum == pageNum) {
@@ -39,7 +39,7 @@ RC PF_HashTable::Insert(int fd, PageNum pageNum, int slot) {
     return 0;
 }
 
-RC PF_HashTable::Delete(int fd, PageNum pageNum) {
+RC PF_HashTable::Delete(uintptr_t fd, PageNum pageNum) {
     int bucket = Hash(fd, pageNum);
 
     for (auto entry = hashTable[bucket].begin(); entry != hashTable[bucket].end(); entry++) {

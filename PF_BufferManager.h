@@ -19,13 +19,11 @@ public:
     }
 
     char* data;
-//    int next;
-//    int prev;
     std::list<int>::iterator it;
     bool dirty;
     short pinCount;
     PageNum pageNum;
-    int fd;
+    uintptr_t fd;
 };
 
 
@@ -34,18 +32,11 @@ public:
     PF_BufferManager(int numPages);
     ~PF_BufferManager();
 
-    RC GetPage(int fd, PageNum pageNum, char *&buffer, bool multiplePins = true);
-    RC AlloatePage(int fd, PageNum pageNum, char *&buffer);
-    RC MarkDirty(int fd, PageNum pageNum);
-    RC UnpinPage(int fd, PageNum pageNum);
-    RC FlushPages(int fd);
-    RC ForcePages(int fd, PageNum pageNum);
-    RC ClearBuffer();
-    RC PrintBuffer();
-    RC ResizeBuffer(int newSize);
-    RC GetBlockSize(int &length) const;
-    RC AllocateBlock(std::vector<char> &buffer);
-    RC DisposeBlock(char *buffer);
+    RC GetPage(uintptr_t fd, PageNum pageNum, char *&buffer, bool multiplePins = true);
+    RC AllocatePage(uintptr_t fd, PageNum pageNum, char *&buffer);
+    RC MarkDirty(uintptr_t fd, PageNum pageNum);
+    RC UnpinPage(uintptr_t fd, PageNum pageNum);
+    RC ForcePages(uintptr_t fd, PageNum pageNum);
 
 private:
     RC InsertFree(int slot);
@@ -54,19 +45,16 @@ private:
     RC Unlink(int slot);
     RC InternalAlloc(int &slot);
 
-    RC ReadPage(int fd, PageNum pageNum, char *dest);
-    RC WritePage(int fd, PageNum pageNum, char *source);
+    RC ReadPage(uintptr_t fd, PageNum pageNum, char *dest);
+    RC WritePage(uintptr_t fd, PageNum pageNum, char *source);
 
-    RC InitPageDesc(int fd, PageNum pageNum, int slot);
+    RC InitPageDesc(uintptr_t fd, PageNum pageNum, int slot);
 
 
     std::vector<PF_BufferPageDesc> bufTable;
     PF_HashTable hashTable;
     int numPages;
     size_t pageSize;
-//    int first;  // MRU page slot
-//    int last;   // LRU page slot
-//    int free;   // head of free list
     std::list<int> free;
     std::list<int> used;
 };

@@ -5,7 +5,8 @@
 #include <cstdio>
 #include <string.h>
 #include <unistd.h>
-#include "PF_Manager.h"
+#include "PF.h"
+#include "PF_BufferManager.h"
 
 
 PF_Manager::PF_Manager() {
