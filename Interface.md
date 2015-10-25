@@ -101,7 +101,7 @@ public:
 	RC DropIndex(const string &relationName,
 				 const string &attrName);
 				 
-	RC GetAttrInfo(const string &relationName, int attrCount, DataAttrInfo &attrData);
+	RC GetAttrInfo(const string &relationName, int attrCount, AttrCatRecord &attrData);
 	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData);
 	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData);
 }
@@ -114,9 +114,9 @@ class RM_Manager {
 public:
 	RM_Manager (PF_Manager &pfm);
 	~RM_Manager();
-	RC CreateFile(string fileName, int recordSize);
-	RC DestroyFile(string fileName);
-	RC OpenFile(string fileName, RM_FileHandle &fileHandle);
+	RC CreateFile(const string &fileName, int recordSize);
+	RC DestroyFile(const string &fileName);
+	RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
 	RC CloseFile(RM_FileHandle &fileHandle);
 }
 
@@ -125,7 +125,7 @@ public:
 	RM_FileHandle();
 	~RM_FileHandle();
 	RC GetRecord(const RID &rid, RM_Record &rec) const;
-	RC InsertRecord(const char *data, RID &rid);
+	RC InsertRecord(const char* data, RID &rid);
 	RC DeleteRecord(const RID &rid);
 	RC UpdateRecord(const RM_Record &record);
 	RC ForcePages(PageNum pageNum = ALL_PAGES) const;
@@ -136,12 +136,12 @@ public:
 	RM_FileScan();
 	~RM_FileScan();
 	RC OpenScan(const RM_FileHandle &fileHandle, 
-				  AttrType attrType,
-				  int attrLength,
-				  int attrOffset,
-				  CmpOp op,
-				  void *value);
-	RC GetNextRecord(RM_Record &rec);
+				AttrType attrType,
+				int attrLength,
+				int attrOffset,
+				CmpOp op,
+				void* ingvalue);
+	RC GetNextRecord(RM_Record &record);
 	RC CloseScan();
 }
 
@@ -149,7 +149,7 @@ class RM_Record {
 public:
 	RM_Record();
 	~RM_Record();
-	RC GetData(char *&data) const;
+	RC GetData(char* &data) const;
 	RC GetRid(RID &rid) const;
 }
 
@@ -159,7 +159,7 @@ public:
 	~RID();
 	RID(PageNum pageNum, SlotNum slotNum);
 	RC GetPageNum(PageNum &pageNum) const;
-	RC GetSlotNum(SlotNum &slotNum) const;
+	RC GetSlotNum(SlotNum &slotNum) const;
 }
 
 ~~~
@@ -187,8 +187,8 @@ class IX_IndexHandle {
 public:
 	IX_IndexHandle();
 	~IX_IndexHandle();
-	RC InsertEntry(void *Data, const RID &rid);
-	RC DeleteEntry(void *data, const RID &rid);
+	RC InsertEntry(void* Data, const RID &rid);
+	RC DeleteEntry(void* data, const RID &rid);
 	RC ForcePages();
 };
 
@@ -198,7 +198,7 @@ public:
 	~IX_IndexScan();
 	RC OpenScan(const IX_IndexHandle &indexHandle,
 				CmpOp, op,
-				void *value);
+				void* value);
 	RC GetNextEntry(RID &rid);
 	RC CloseScan();
 };
@@ -214,8 +214,6 @@ public:
 	RC DestoryFile(const string &fileName);
 	RC OpenFile(const char &fileName, PF_FileHandle &fileHandle);
 	RC CloseFile(PF_FileHandle &fileHandle);
-	RC AllocateBlock(char *&buffer);
-	RC DisposeBlock(char *buffer);
 };
 
 class PF_FileHandle {
@@ -245,7 +243,7 @@ public:
 	PF_PageHandle(const PF_PageHandle &pageHandle);
 	PF_PageHandle& operator=(const PF_PageHandle &pageHandle);
 	
-	RC GetData(char *&data) const;
+	RC GetData(char* &data) const;
 	RC GetPageNum(PageNum &pageNum) const;
 };
 

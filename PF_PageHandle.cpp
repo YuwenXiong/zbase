@@ -29,7 +29,7 @@ PF_PageHandle& PF_PageHandle::operator=(const PF_PageHandle &pageHandle) {
     return *this;
 }
 
-RC PF_PageHandle::GetData(char *&data) const {
+RC PF_PageHandle::GetData(char* &data) const {
     if (pageData == NULL) {
         return PF_PAGE_UNPINNED;
     }

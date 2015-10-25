@@ -32,8 +32,8 @@ public:
     PF_BufferManager(int numPages);
     ~PF_BufferManager();
 
-    RC GetPage(uintptr_t fd, PageNum pageNum, char *&buffer, bool multiplePins = true);
-    RC AllocatePage(uintptr_t fd, PageNum pageNum, char *&buffer);
+    RC GetPage(uintptr_t fd, PageNum pageNum, char* &buffer, bool multiplePins = true);
+    RC AllocatePage(uintptr_t fd, PageNum pageNum, char* &buffer);
     RC MarkDirty(uintptr_t fd, PageNum pageNum);
     RC UnpinPage(uintptr_t fd, PageNum pageNum);
     RC ForcePages(uintptr_t fd, PageNum pageNum);

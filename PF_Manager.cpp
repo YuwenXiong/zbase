@@ -87,11 +87,3 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle) {
     fileHandle.bufferManager = NULL;
     return RC_OK;
 }
-
-//RC PF_Manager::AllocateBlock(char *&buffer) {
-//    bufferManager->AllocateBlock(buffer);
-//}
-//
-//RC PF_Manager::DisposeBlock(char *buffer) {
-//    bufferManager->DisposeBlock(buffer);
-//}

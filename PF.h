@@ -46,7 +46,7 @@ public:
     PF_PageHandle(const PF_PageHandle &pageHandle);
     PF_PageHandle& operator= (const PF_PageHandle &pageHandle);
 
-    RC GetData(char *&data) const;
+    RC GetData(char* &data) const;
     RC GetPageNum(PageNum &pageNum) const;
 
 private:
@@ -92,7 +92,7 @@ public:
     ~PF_Manager();
     RC CreateFile(const char *fileName);
     RC DestoryFile(const char *fileName);
-    RC OpenFile(const char *fileName, PF_FileHandle & fileHandle);
+    RC OpenFile(const char *fileName, PF_FileHandle &fileHandle);
     RC CloseFile(PF_FileHandle &fileHandle);
 private:
     PF_BufferManager *bufferManager;

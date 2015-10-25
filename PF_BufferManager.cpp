@@ -26,7 +26,7 @@ PF_BufferManager::PF_BufferManager(int _numPages): hashTable(PF_HASH_TABLE_SIZE)
 PF_BufferManager::~PF_BufferManager() {
 }
 
-RC PF_BufferManager::GetPage(uintptr_t fd, PageNum pageNum, char *&buffer, bool multiplePins) {
+RC PF_BufferManager::GetPage(uintptr_t fd, PageNum pageNum, char* &buffer, bool multiplePins) {
     RC rc;
     int slot;
     if (((rc = hashTable.Find(fd, pageNum, slot)) != 0) && (rc != PF_HASH_NOT_FOUND)) {
@@ -60,7 +60,7 @@ RC PF_BufferManager::GetPage(uintptr_t fd, PageNum pageNum, char *&buffer, bool 
     return RC_OK;
 }
 
-RC PF_BufferManager::AllocatePage(uintptr_t fd, PageNum pageNum, char *&buffer) {
+RC PF_BufferManager::AllocatePage(uintptr_t fd, PageNum pageNum, char* &buffer) {
     RC rc;
     int slot;
 
