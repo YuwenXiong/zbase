@@ -6,7 +6,7 @@
 #define ZBASE_ZBASE_H
 
 #include <string>
-using std::string
+using std::string;
 
 // return code for traceback
 typedef int RC;

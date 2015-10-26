@@ -9,6 +9,8 @@
 #include "PF.h"
 #include "zbase.h"
 
+#define RM_EOF -1
+
 using namespace std;
 
 typedef int PageNum;
@@ -31,18 +33,6 @@ public:
     RC GetRid(RID &rid) const;
 };
 
-class RM_Manager {
-public:
-    RM_Manager (PF_Manager &pfm);
-    ~RM_Manager();
-    RC CreateFile(const string &fileName, int recordSize);
-    RC DestoryFile(const string &fileName);
-    RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
-    RC CloseFile(RM_FileHandle &fileHandle);
-};
-
-
-
 class RM_FileHandle {
 public:
     RM_FileHandle();
@@ -52,6 +42,16 @@ public:
     RC DeleteRecord(const RID &rid);
     RC UpdateRecord(const RM_Record &record);
     RC ForcePages(PageNum pageNum = ALL_PAGES) const;
+};
+
+class RM_Manager {
+public:
+    RM_Manager (PF_Manager &pfm);
+    ~RM_Manager();
+    RC CreateFile(const string &fileName, int recordSize);
+    RC DestoryFile(const string &fileName);
+    RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
+    RC CloseFile(RM_FileHandle &fileHandle);
 };
 
 class RM_FileScan {
