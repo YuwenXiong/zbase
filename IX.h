@@ -14,8 +14,8 @@ class IX_IndexHandle {
 public:
     IX_IndexHandle();
     ~IX_IndexHandle();
-    RC InsertEntry(void* data, const RID &rid);
-    RC DeleteEntry(void* data, const RID &rid);
+    RC InsertEntry(Value &data, const RID &rid);
+    RC DeleteEntry(Value &data, const RID &rid);
     RC ForcePages();
 };
 

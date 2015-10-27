@@ -56,4 +56,25 @@ struct AttrCatRecord {
     int indexNo;
 };
 
+struct Value {
+    AttrType type;
+    int iData;
+    float fData;
+    string strData;
+};
+
+struct RelationAttr {
+    string relationName;
+    string attrName;
+}
+
+struct Condition {
+    RelationAttr lAttr; // left-hand side attr
+    CmpOp op;
+    bool rAttrIsAttr; // true if right-hand side is an attribute
+    RelationAttr rAttr; // right-hand side attr
+    Value rValue;
+};
+
+
 #endif //ZBASE_ZBASE_H

@@ -12,6 +12,10 @@ enum CmpOp {
 	EQ, NE, NO
 };
 
+enum Property {
+	PRIMARY, UNIQUE, NONE
+};
+
 struct RelationAttr {
 	string relationName;
 	string attrName;
@@ -19,7 +23,9 @@ struct RelationAttr {
 
 struct Value {
 	AttrType type;
-	void *data;
+	int iData;
+	float fData;
+	string strData;
 }
 
 struct Condition {
@@ -48,6 +54,7 @@ struct AttrCatRecord {
 	string attrName;
 	int offset;
 	AttrType attrType;
+	Property property;
 	int attrLength;
 	int indexNo;
 };
@@ -140,7 +147,7 @@ public:
 				int attrLength,
 				int attrOffset,
 				CmpOp op,
-				void* ingvalue);
+				Value &value);
 	RC GetNextRecord(RM_Record &record);
 	RC CloseScan();
 }
@@ -187,8 +194,8 @@ class IX_IndexHandle {
 public:
 	IX_IndexHandle();
 	~IX_IndexHandle();
-	RC InsertEntry(void* Data, const RID &rid);
-	RC DeleteEntry(void* data, const RID &rid);
+	RC InsertEntry(Value &Data, const RID &rid);
+	RC DeleteEntry(Value &data, const RID &rid);
 	RC ForcePages();
 };
 
@@ -198,7 +205,7 @@ public:
 	~IX_IndexScan();
 	RC OpenScan(const IX_IndexHandle &indexHandle,
 				CmpOp, op,
-				void* value);
+				Value value);
 	RC GetNextEntry(RID &rid);
 	RC CloseScan();
 };
