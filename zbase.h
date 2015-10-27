@@ -8,6 +8,8 @@
 #include <string>
 using std::string;
 
+#define MAXRELATIONNAME 255
+
 // return code for traceback
 typedef int RC;
 
@@ -24,7 +26,7 @@ enum AttrType {
 };
 
 enum CmpOp {
-    EQ, NE
+    EQ, NE, NO
 };
 
 struct AttrInfo {

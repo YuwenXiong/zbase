@@ -9,7 +9,7 @@ enum AttrType {
 };
 
 enum CmpOp {
-	EQ, NE
+	EQ, NE, NO
 };
 
 struct RelationAttr {
@@ -102,8 +102,8 @@ public:
 				 const string &attrName);
 				 
 	RC GetAttrInfo(const string &relationName, int attrCount, vector<AttrCatRecord> &attrs);
-	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData);
-	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData);
+	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid);
+	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData, RID &rid);
 }
 
 ~~~

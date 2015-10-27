@@ -10,8 +10,8 @@
 #include "RM.h"
 using namespace std;
 
-#define MAXRELATIONNAME 255
 #define SM_NOTFOUND -1
+#define SM_INDEXEXISTS -2
 
 class SM_Manager {
 private:
@@ -30,8 +30,8 @@ public:
     RC CreateIndex(const string &relationName, const string &attrName);
     RC DropIndex(const string &relationName, const string &attrName);
     RC GetAttrInfo(const string &relationName, int attrCount, vector<AttrCatRecord> &attrs);
-    RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData);
-    RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData);
+    RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid);
+    RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData, RID &rid);
 };
 
 
