@@ -16,28 +16,35 @@ using namespace std;
 typedef int PageNum;
 typedef int SlotNum;
 
+const int SLOT_PER_PAGE=
+
 class RID {
 public:
-    RID();
+
     ~RID();
-    RID(PageNum pageNum, SlotNum slotNum);
+    RID(PageNum pageNum =NULL_PAGE, SlotNum slotNum=NULL_SLOT);
     RC GetPageNum(PageNum &pageNum) const;
     RC GetSlotNum(SlotNum &slotNum) const;
 
 private:
-    PageNum pagenum;
-    SlotNum slotnum;
+    PageNum pageNum;
+    SlotNum slotNum;
 };
 
 class RM_Record {
 public:
-    RM_Record(int recordSize);
+    RM_Record();
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
+
+private:
+    char* data;
+    RID rid;
 };
 
 class RM_FileHandle {
+    friend class RM_Manager;
 public:
     RM_FileHandle();
     ~RM_FileHandle();
@@ -46,6 +53,11 @@ public:
     RC DeleteRecord(const RID &rid);
     RC UpdateRecord(const RM_Record &record);
     RC ForcePages(PageNum pageNum = ALL_PAGES) const;
+
+private:
+    PF_FileHandle pffh;
+    PF_PageHandle pfph;
+
 };
 
 class RM_Manager {
@@ -56,6 +68,9 @@ public:
     RC DestoryFile(const string &fileName);
     RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
     RC CloseFile(RM_FileHandle &fileHandle);
+private:
+    PF_Manager pfm;
+
 };
 
 class RM_FileScan {
@@ -66,5 +81,8 @@ public:
     RC GetNextRecord(RM_Record &record);
     RC CloseScan();
 };
+//
+const RC RM_NULL_PAGE=RM_RC+1;
+const RC RM_NULL_SLOT=RM_RC+2;
 
 #endif //ZBASE_RM_H

@@ -6,6 +6,8 @@
 #define ZBASE_ZBASE_H
 
 #include <string>
+#include "PF.h"
+
 using std::string;
 
 #define MAXRELATIONNAME 255
@@ -16,8 +18,11 @@ typedef int RC;
 const RC RC_OK = 0;
 
 const RC PF_RC = 100;
+const RC RM_RC =200;
 
 const int ALL_PAGES = -1;
+const int NULL_PAGE=-2;
+const int NULL_SLOT=-2;
 
 enum AttrType {
     INT,
