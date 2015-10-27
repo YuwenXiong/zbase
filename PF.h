@@ -40,6 +40,7 @@ class PF_BufferManager;
 // This class provides access to the contents of a given page.
 class PF_PageHandle {
     friend class PF_FileHandle;
+    friend class RM_FileHandle;
 public:
     PF_PageHandle();
     ~PF_PageHandle();
@@ -56,6 +57,8 @@ private:
 
 class PF_FileHandle {
     friend class PF_Manager;
+    friend class RM_Manager;
+    friend class RM_FileHandle;
 public:
     PF_FileHandle();
     ~PF_FileHandle();
@@ -87,6 +90,7 @@ private:
 };
 
 class PF_Manager {
+    friend class RM_Manager;
 public:
     PF_Manager();
     ~PF_Manager();

@@ -7,6 +7,7 @@
 
 #include <string>
 #include "PF.h"
+#include "string.h"
 
 using std::string;
 

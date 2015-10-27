@@ -16,8 +16,19 @@ using namespace std;
 typedef int PageNum;
 typedef int SlotNum;
 
-const int SLOT_PER_PAGE=
+const size_t FIRST_SLOT=sizeof(PF_PageHeader);
 
+struct RM_RecordFileHeader{
+    int slotPerPage;
+    int recordSize;
+    int slotSize;
+    RID firstFreeSlot;
+    RID lastFreeSlot;
+};
+struct RM_SlotHeader{
+    bool empty;
+    RID nextFreeSlot;
+};
 class RID {
 public:
 
@@ -25,19 +36,20 @@ public:
     RID(PageNum pageNum =NULL_PAGE, SlotNum slotNum=NULL_SLOT);
     RC GetPageNum(PageNum &pageNum) const;
     RC GetSlotNum(SlotNum &slotNum) const;
-
+    bool operator==(const RID &rid)const;
 private:
     PageNum pageNum;
     SlotNum slotNum;
 };
 
 class RM_Record {
+    friend class RM_FileHandle;
 public:
     RM_Record();
+    RM_Record(int recordSize,RID rid);
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
-
 private:
     char* data;
     RID rid;
@@ -52,12 +64,13 @@ public:
     RC InsertRecord(const char* data, RID &rid);
     RC DeleteRecord(const RID &rid);
     RC UpdateRecord(const RM_Record &record);
-    RC ForcePages(PageNum pageNum = ALL_PAGES) const;
+    RC ForcePages(PageNum pageNum = ALL_PAGES) ;
 
 private:
     PF_FileHandle pffh;
     PF_PageHandle pfph;
-
+    RM_RecordFileHeader header;
+    bool headerChanged;
 };
 
 class RM_Manager {
@@ -69,7 +82,7 @@ public:
     RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
     RC CloseFile(RM_FileHandle &fileHandle);
 private:
-    PF_Manager pfm;
+    PF_Manager *pfm;
 
 };
 
@@ -84,5 +97,7 @@ public:
 //
 const RC RM_NULL_PAGE=RM_RC+1;
 const RC RM_NULL_SLOT=RM_RC+2;
-
+const RC RM_READ_EMPTY_SLOT=RM_RC+3;
+const RC RM_ALREADY_DELETED=RM_RC+4;
+const RC RM_NO_VALID_DATA=RM_RC+5;
 #endif //ZBASE_RM_H
