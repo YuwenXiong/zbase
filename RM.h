@@ -23,11 +23,15 @@ public:
     RID(PageNum pageNum, SlotNum slotNum);
     RC GetPageNum(PageNum &pageNum) const;
     RC GetSlotNum(SlotNum &slotNum) const;
+
+private:
+    PageNum pagenum;
+    SlotNum slotnum;
 };
 
 class RM_Record {
 public:
-    RM_Record();
+    RM_Record(int recordSize);
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
