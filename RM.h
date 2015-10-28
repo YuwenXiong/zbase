@@ -17,7 +17,7 @@ typedef int PageNum;
 typedef int SlotNum;
 
 const size_t FIRST_SLOT=sizeof(PF_PageHeader);
-
+const size_t RM_RECORD_HEADER_OFFSET=sizeof(PF_FileHeader);
 struct RM_RecordFileHeader{
     int slotPerPage;
     int recordSize;
@@ -37,6 +37,7 @@ public:
     RC GetPageNum(PageNum &pageNum) const;
     RC GetSlotNum(SlotNum &slotNum) const;
     bool operator==(const RID &rid)const;
+    bool operator>=(const RID &rid)const;
 private:
     PageNum pageNum;
     SlotNum slotNum;
@@ -57,6 +58,7 @@ private:
 
 class RM_FileHandle {
     friend class RM_Manager;
+    friend class RM_FileScan;
 public:
     RM_FileHandle();
     ~RM_FileHandle();
@@ -90,9 +92,21 @@ class RM_FileScan {
 public:
     RM_FileScan();
     ~RM_FileScan();
-    RC OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, void* value);
+    RC OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, Value value);
     RC GetNextRecord(RM_Record &record);
     RC CloseScan();
+private:
+    RID currentRID;
+    AttrType type;
+    int length;
+    int offset;
+    Value value;
+    CmpOp op;
+    bool open=false;
+    RC UpdateRID();
+    bool IsValid(RM_Record &record);
+
+    RM_FileHandle* rmfh;
 };
 //
 const RC RM_NULL_PAGE=RM_RC+1;
@@ -100,4 +114,6 @@ const RC RM_NULL_SLOT=RM_RC+2;
 const RC RM_READ_EMPTY_SLOT=RM_RC+3;
 const RC RM_ALREADY_DELETED=RM_RC+4;
 const RC RM_NO_VALID_DATA=RM_RC+5;
+const RC RM_FILESCAN_ALREADY_OPEN=RM_RC+6;
+const RC RM_SCAN_EMPTY_RECORD=RM_RC+7;
 #endif //ZBASE_RM_H

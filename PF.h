@@ -46,7 +46,6 @@ public:
     ~PF_PageHandle();
     PF_PageHandle(const PF_PageHandle &pageHandle);
     PF_PageHandle& operator= (const PF_PageHandle &pageHandle);
-
     RC GetData(char* &data) const;
     RC GetPageNum(PageNum &pageNum) const;
 
@@ -59,6 +58,7 @@ class PF_FileHandle {
     friend class PF_Manager;
     friend class RM_Manager;
     friend class RM_FileHandle;
+    friend class IX_Manager;
 public:
     PF_FileHandle();
     ~PF_FileHandle();
