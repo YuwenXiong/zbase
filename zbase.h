@@ -31,11 +31,7 @@ enum AttrType {
 };
 
 enum CmpOp {
-<<<<<<< HEAD
     EQ, NE, NO, LT, LE, GT, GE
-=======
-    EQ, NE, GT, GE, LT, LE, NO
->>>>>>> e05b67eb4847dd30d193905bc062389ee59b94bf
 };
 
 enum Property {
