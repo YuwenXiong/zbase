@@ -6,7 +6,6 @@
 #define ZBASE_ZBASE_H
 
 #include <string>
-#include "PF.h"
 #include "string.h"
 
 using std::string;
@@ -32,13 +31,20 @@ enum AttrType {
 };
 
 enum CmpOp {
-    EQ, NE, NO
+    EQ, NE, NO, LT, LE, GT, GE
 };
+
+enum Property {
+    PRIMARY, UNIQUE, NONE
+};
+
 
 struct AttrInfo {
     string attrName;
     AttrType attrType;
     int attrLength;
+    Property property;
+    AttrInfo(string n, AttrType t, int l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
 };
 
 struct RelationCatRecord {
@@ -55,6 +61,7 @@ struct AttrCatRecord {
     AttrType attrType;
     int attrLength;
     int indexNo;
+    Property property;
 };
 
 struct Value {
@@ -62,19 +69,27 @@ struct Value {
     int iData;
     float fData;
     string strData;
+    Value(int x): iData(x) {
+        type = INT;
+    }
+    Value(float x): fData(x) {
+        type = FLOAT;
+    }
+    Value(string x): strData(x) {
+        type = CHARN;
+    }
 };
 
 struct RelationAttr {
     string relationName;
     string attrName;
-}
+};
 
 struct Condition {
-    RelationAttr lAttr; // left-hand side attr
+    string lAttr; // left-hand side attr
     CmpOp op;
-    bool rAttrIsAttr; // true if right-hand side is an attribute
-    RelationAttr rAttr; // right-hand side attr
     Value rValue;
+    Condition(string l, CmpOp m, Value r): lAttr(l), op(m), rValue(r) { }
 };
 
 

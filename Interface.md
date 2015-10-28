@@ -19,14 +19,14 @@ enum Property {
 struct RelationAttr {
 	string relationName;
 	string attrName;
-}
+};
 
 struct Value {
 	AttrType type;
 	int iData;
 	float fData;
 	string strData;
-}
+};
 
 struct Condition {
 	RelationAttr lAttr; // left-hand side attr
@@ -34,12 +34,13 @@ struct Condition {
 	bool rAttrIsAttr; // true if right-hand side is an attribute
 	RelationAttr rAttr; // right-hand side attr
 	Value rValue;
-}
+};
 
 struct AttrInfo {
 	string attrName;
 	AttrType attrType;
 	int attrLength;
+	Property property;
 };
 
 struct RelationCatRecord {
@@ -104,9 +105,11 @@ public:
 				   const vector<AttrInfo> &attrs);
 	RC DropTable(const string &relationName);
 	RC CreateIndex(const string &relationName,
-				   const string &attrName);
+				   const string &attrName
+				   const string &idxName);
 	RC DropIndex(const string &relationName,
-				 const string &attrName);
+				 const string &attrName
+				 const string &idxName);
 				 
 	RC GetAttrInfo(const string &relationName, int attrCount, vector<AttrCatRecord> &attrs);
 	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid);

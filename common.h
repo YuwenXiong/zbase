@@ -2,13 +2,12 @@
 // Created by Orpine on 10/27/15.
 //
 
-#ifndef ZBASE_PARSER_H
-#define ZBASE_PARSER_H
+#ifndef ZBASE_COMMON_H
+#define ZBASE_COMMON_H
 
 #include <string>
 #include <vector>
-#include "../zbase.h"
-
+#include "zbase.h"
 using namespace std;
 
 typedef enum {
@@ -18,7 +17,11 @@ typedef enum {
     DROPINDEX,
     SELECT,
     INSERT,
-    DELETE
+    DELETE,
+    EXIT,
+    EMPTY,
+    ATTR,
+    VALUE
 } nodeType;
 
 struct State {
@@ -33,5 +36,21 @@ struct State {
     vector<Condition> conditions;
 };
 
+struct Type {
+    int ival;
+    float fval;
+    string sval;
+    CmpOp cval;
+    Property pval;
+    State tval;
+};
 
-#endif //ZBASE_PARSER_H
+#define YYSTYPE Type
+
+extern "C" {
+    extern int yylex(void);
+}
+
+void yyerror(const char *);
+
+#endif //ZBASE_COMMON_H
