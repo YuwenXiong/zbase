@@ -44,7 +44,6 @@ RC RM_Record::GetData(char *&data) const {
 }
 RM_Record::RM_Record(int recordSize,RID rid):rid(rid){
     char * data=new char[recordSize];
-
 }
 RM_Record::~RM_Record(){
     delete []data;
@@ -89,21 +88,9 @@ RC RM_Manager::CreateFile(const string &fileName, int recordSize){
 
 RC RM_Manager::OpenFile(const string &fileName, RM_FileHandle &fileHandle) {
     RC rc;
-    if (fileHandle.pffh.fileOpen) {
-        return PF_FILE_ALREADY_OPEN;
-    }
-    if ((fileHandle.pffh.fp = fopen(fileName.c_str(), "r")) == NULL) {
-        return PF_SYSTEM_ERROR;
-    }
-    size_t numBytes = fread(&(fileHandle.pffh.header), sizeof(fileHandle.pffh.header), 1, fileHandle.pffh.fp);
-    if (numBytes != sizeof(PF_FileHeader)) {
-        rc = PF_SYSTEM_ERROR;
-        fclose(fileHandle.pffh.fp);
-        fileHandle.pffh.fileOpen = false;
+    if((rc=pfm->OpenFile(fileName.c_str(),fileHandle.pffh)))
         return rc;
-    }
-
-    numBytes = fread(&(fileHandle.header), sizeof(fileHandle.header), 1, fileHandle.pffh.fp);
+    size_t numBytes = fread(&(fileHandle.header), sizeof(fileHandle.header), 1, fileHandle.pffh.fp);
     if (numBytes != sizeof( RM_RecordFileHeader)) {
         rc = PF_SYSTEM_ERROR;
         fclose(fileHandle.pffh.fp);
@@ -111,10 +98,6 @@ RC RM_Manager::OpenFile(const string &fileName, RM_FileHandle &fileHandle) {
         return rc;
     }
     fileHandle.headerChanged=false;
-    fileHandle.pffh.headerChanged = false;
-    fileHandle.pffh.bufferManager = this->pfm->bufferManager;
-    fileHandle.pffh.fileOpen = true;
-
     return RC_OK;
 
 }
@@ -124,7 +107,7 @@ RC RM_Manager::DestoryFile(const string &fileName) {
 }
 RC RM_Manager::CloseFile(RM_FileHandle &fileHandle) {
     RC rc;
-    if(rc=fileHandle.ForcePages()!=0)return rc;
+    if((rc=fileHandle.ForcePages()))return rc;
     return pfm->CloseFile(fileHandle.pffh);
 }
 
@@ -132,14 +115,14 @@ RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) const {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
-    if (rid.GetPageNum(pageNum)!=0)
+    if ((rc=rid.GetPageNum(pageNum)))
         return rc;
     if(rid.GetSlotNum(slotNum)!=0)
         return rc;
 
-    if(rc=pffh.GetThisPage(pageNum,pfph)!=0)
+    if((rc=pffh.GetThisPage(pageNum,pfph)))
         return rc;
-    if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty==true)
+    if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty)
         return RM_READ_EMPTY_SLOT;
     rec=RM_Record(header.recordSize,rid);
     memcpy(rec.data,pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),header.recordSize);
@@ -149,14 +132,14 @@ RC RM_FileHandle::DeleteRecord(const RID &rid) {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
-    if (rid.GetPageNum(pageNum)!=0)
+    if ((rc=rid.GetPageNum(pageNum)))
         return rc;
-    if(rid.GetSlotNum(slotNum)!=0)
+    if((rc=rid.GetSlotNum(slotNum)))
         return rc;
 
-    if(rc=pffh.GetThisPage(pageNum,pfph)!=0)
+    if((rc=pffh.GetThisPage(pageNum,pfph)))
         return rc;
-    if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty==true)
+    if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty)
         return RM_ALREADY_DELETED;
     RM_SlotHeader slotHeader;
     slotHeader.empty=true;
@@ -164,7 +147,7 @@ RC RM_FileHandle::DeleteRecord(const RID &rid) {
     header.firstFreeSlot=rid;
     memcpy(pfph.pageData+slotNum*header.slotSize,&slotHeader,sizeof(RM_SlotHeader));
 
-    if(rc=pffh.MarkDirty(pageNum)!=0)
+    if((rc=pffh.MarkDirty(pageNum)))
         return rc;
     return 0;
 }
@@ -174,16 +157,16 @@ RC RM_FileHandle::UpdateRecord(const RM_Record &record) {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
-    if(rc=record.GetRid(rid)!=0)
+    if((rc=record.GetRid(rid)))
         return rc;
-    if (rid.GetPageNum(pageNum)!=0)
+    if ((rc=rid.GetPageNum(pageNum)))
         return rc;
-    if(rid.GetSlotNum(slotNum)!=0)
+    if((rc=rid.GetSlotNum(slotNum)))
         return rc;
-    if(rc=pffh.GetThisPage(pageNum,pfph)!=0)
+    if((rc=pffh.GetThisPage(pageNum,pfph)))
         return rc;
     memcpy(pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),record.data,header.recordSize);
-    if(rc=pffh.MarkDirty(pageNum)!=0)
+    if((rc=pffh.MarkDirty(pageNum)))
         return rc;
     return 0;
 }
@@ -194,7 +177,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     SlotNum slotNumF,slotNumL;
     bool insertAtTail=false;
     if(header.firstFreeSlot.GetPageNum(pageNumF)==RM_NULL_PAGE){
-        if(rc=pffh.AllocatePage(pfph)!=0)
+        if((rc=pffh.AllocatePage(pfph)))
             return rc;
         pageNumF=0;
         slotNumF=0;
@@ -203,7 +186,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     else {
         header.firstFreeSlot.GetPageNum(slotNumF);
         if (slotNumF==header.slotPerPage){
-            if(rc=pffh.AllocatePage(pfph)!=0)
+            if((rc=pffh.AllocatePage(pfph)))
                 return rc;
             pageNumF++;
             slotNumF=0;
@@ -211,7 +194,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
 
         }
         else{
-            if(rc=pffh.GetThisPage(pageNumF,pfph)!=0)
+            if((rc=pffh.GetThisPage(pageNumF,pfph)))
                 return rc;
             if(header.lastFreeSlot==RID(pageNumF,slotNumF)){
                 insertAtTail=true;
@@ -229,7 +212,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     memcpy(pfph.pageData+slotNumF*header.slotSize,&slotHeader,sizeof(RM_SlotHeader));
     memcpy(pfph.pageData+slotNumF*header.slotSize+sizeof(RM_SlotHeader),data,header.recordSize);
     rid=RID(pageNumF,slotNumF);
-    if(rc=pffh.MarkDirty(pageNumF)!=0)
+    if((rc=pffh.MarkDirty(pageNumF)))
         return rc;
     return 0;
 
@@ -240,7 +223,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return PF_FILE_CLOSED;
     }
     if (headerChanged) {
-        if (fseek(pffh.fp, 0,0) < 0) {
+        if (fseek(pffh.fp, 0,RM_RECORD_HEADER_OFFSET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&header, sizeof(RM_RecordFileHeader), 1, pffh.fp) != 1) {
@@ -249,7 +232,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         headerChanged = false;
     }
     RC rc;
-    if(rc=pffh.ForcePages(pageNum)!=0)
+    if((rc=pffh.ForcePages(pageNum)))
         return rc;
 }
 
@@ -261,6 +244,7 @@ RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int
     length=attrLength;
     offset=attrOffset;
     this->op=op;
+    this->value=value;
     currentRID=RID(0,0);
     open=true;
     rmfh=&fileHandle;
@@ -274,20 +258,89 @@ RC RM_FileScan::CloseScan() {
 RC RM_FileScan::GetNextRecord(RM_Record &record) {
     RC rc;
     if(currentRID>=rmfh->header.lastFreeSlot)return RM_EOF;
-    while(rmfh->GetRecord(currentRID,record)==RM_READ_EMPTY_SLOT){
-        if(rc=updateRID()!=0)
+    while(rmfh->GetRecord(currentRID,record)==RM_READ_EMPTY_SLOT||!IsValid(record)){
+        if((rc=UpdateRID()))
             return rc;
     }
-    updateRID();
+    UpdateRID();
     return 0;
 }
-RC RM_FileScan::updateRID() {
+bool RM_FileScan::IsValid(RM_Record &record){
+    char* data;
+    record.GetData(data);
+    if (type==INT){
+        int rec=*(int*)(data+offset);
+        int val=value.iData;
+        switch (op){
+            case EQ:
+                return rec==val;
+            case NE:
+                return rec!=val;
+            case GT:
+                return rec>val;
+            case GE:
+                return rec>=val;
+            case LT:
+                return rec<val;
+            case LE:
+                return rec<=val;
+            case NO:
+                return true;
+        }
+    }
+    if (type==FLOAT){
+        float rec=*(float*)(data+offset);
+        float val=value.fData;
+        switch (op){
+            case EQ:
+                return rec==val;
+            case NE:
+                return rec!=val;
+            case GT:
+                return rec>val;
+            case GE:
+                return rec>=val;
+            case LT:
+                return rec<val;
+            case LE:
+                return rec<=val;
+            case NO:
+                return true;
+        }
+    }
+    if(type==CHARN){
+        char* recC=new char[length];
+        memcpy(recC,data+offset,length);
+        string rec(recC);
+        delete[] recC;
+        string val=value.strData;
+        switch (op){
+            case EQ:
+                return rec==val;
+            case NE:
+                return rec!=val;
+            case GT:
+                return rec>val;
+            case GE:
+                return rec>=val;
+            case LT:
+                return rec<val;
+            case LE:
+                return rec<=val;
+            case NO:
+                return true;
+        }
+    }
+
+}
+
+RC RM_FileScan::UpdateRID() {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
-    if(rc=currentRID.GetPageNum(pageNum)!=0)
+    if((rc=currentRID.GetPageNum(pageNum)))
         return rc;
-    if(rc=currentRID.GetSlotNum(slotNum)!=0)
+    if((rc=currentRID.GetSlotNum(slotNum)))
         return rc;
     if(++slotNum==rmfh->header.slotPerPage){
         slotNum=0;

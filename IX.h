@@ -7,16 +7,24 @@
 
 #include "PF.h"
 #include "RM.h"
+#include "B_Tree.h"
 #include <string>
 using namespace std;
 
+const size_t B_TREE_HEADER_OFFSET=sizeof(PF_PageHeader);
+
 class IX_IndexHandle {
+    friend class IX_Manager;
 public:
     IX_IndexHandle();
     ~IX_IndexHandle();
     RC InsertEntry(Value &data, const RID &rid);
     RC DeleteEntry(Value &data, const RID &rid);
     RC ForcePages();
+private:
+    B_Tree b_tree;
+    PF_FileHandle pffh;
+    PF_PageHandle pfph;
 };
 
 class IX_IndexScan {
@@ -35,7 +43,9 @@ public:
     RC CreateIndex(const string &fileName, int indexNo, AttrType attrType, int attrLength);
     RC DestoryIndex(const string &fileName, int indexNo);
     RC OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &indexHandle);
-    RC CloseIndxe(IX_IndexHandle &indexHandle);
+    RC CloseIndex(IX_IndexHandle &indexHandle);
+private:
+    PF_Manager *pfm;
 };
 
 #endif //ZBASE_IX_H

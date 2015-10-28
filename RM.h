@@ -17,7 +17,7 @@ typedef int PageNum;
 typedef int SlotNum;
 
 const size_t FIRST_SLOT=sizeof(PF_PageHeader);
-
+const size_t RM_RECORD_HEADER_OFFSET=sizeof(PF_FileHeader);
 struct RM_RecordFileHeader{
     int slotPerPage;
     int recordSize;
@@ -100,9 +100,12 @@ private:
     AttrType type;
     int length;
     int offset;
+    Value value;
     CmpOp op;
     bool open=false;
-    RC updateRID();
+    RC UpdateRID();
+    bool IsValid(RM_Record &record);
+
     RM_FileHandle* rmfh;
 };
 //
