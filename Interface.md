@@ -9,7 +9,7 @@ enum AttrType {
 };
 
 enum CmpOp {
-	EQ, NE, NO
+	EQ, NE, GT, GE, LT, LE, NO,
 };
 
 enum Property {

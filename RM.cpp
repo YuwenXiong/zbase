@@ -22,6 +22,9 @@ RC RID::GetSlotNum(SlotNum &slotNum) const {
 bool RID::operator==(const RID &rid)const{
     return (pageNum==rid.pageNum)&&(slotNum==rid.slotNum);
 }
+bool RID::operator>=(const RID &rid)const{
+    return (pageNum>rid.pageNum)||((pageNum==rid.pageNum)&&(slotNum>=rid.slotNum));
+}
 RM_Manager::RM_Manager(PF_Manager &pfm):pfm(&pfm){
 }
 
@@ -58,7 +61,7 @@ RC RM_Manager::CreateFile(const string &fileName, int recordSize){
     fileHeader.numPages = 0;
     RM_RecordFileHeader recordFileHeader;
     recordFileHeader.firstFreeSlot=RID();
-    recordFileHeader.lastFreeSlot=RID();
+    recordFileHeader.lastFreeSlot=RID(0,0);
     recordFileHeader.recordSize=recordSize;
     recordFileHeader.slotSize=recordSize+sizeof(RM_SlotHeader);
     recordFileHeader.slotPerPage=PF_PAGE_SIZE/recordFileHeader.slotSize;
@@ -199,7 +202,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     }
     else {
         header.firstFreeSlot.GetPageNum(slotNumF);
-        if (slotNumF==header.recordSize){
+        if (slotNumF==header.slotPerPage){
             if(rc=pffh.AllocatePage(pfph)!=0)
                 return rc;
             pageNumF++;
@@ -249,3 +252,54 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
     if(rc=pffh.ForcePages(pageNum)!=0)
         return rc;
 }
+
+RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
+                         Value value) {
+    if(open)return RM_FILESCAN_ALREADY_OPEN;
+    if(fileHandle.header.lastFreeSlot==RID(0,0))return RM_SCAN_EMPTY_RECORD;
+    type=attrType;
+    length=attrLength;
+    offset=attrOffset;
+    this->op=op;
+    currentRID=RID(0,0);
+    open=true;
+    rmfh=&fileHandle;
+    return 0;
+}
+RC RM_FileScan::CloseScan() {
+    open=false;
+    rmfh=NULL;
+    return 0;
+}
+RC RM_FileScan::GetNextRecord(RM_Record &record) {
+    RC rc;
+    if(currentRID>=rmfh->header.lastFreeSlot)return RM_EOF;
+    while(rmfh->GetRecord(currentRID,record)==RM_READ_EMPTY_SLOT){
+        if(rc=updateRID()!=0)
+            return rc;
+    }
+    updateRID();
+    return 0;
+}
+RC RM_FileScan::updateRID() {
+    PageNum pageNum;
+    SlotNum slotNum;
+    RC rc;
+    if(rc=currentRID.GetPageNum(pageNum)!=0)
+        return rc;
+    if(rc=currentRID.GetSlotNum(slotNum)!=0)
+        return rc;
+    if(++slotNum==rmfh->header.slotPerPage){
+        slotNum=0;
+        pageNum++;
+    }
+    currentRID=RID(pageNum,slotNum);
+    if(currentRID>=rmfh->header.lastFreeSlot)
+        return RM_EOF;
+    return 0;
+}
+
+
+
+
+
