@@ -9,6 +9,8 @@
     int checkToken(string s);
 %}
 
+anytoken    ({single_quote}([^\'])+{single_quote})|{double_quote}([^\"])+{double_quote}
+
 nondigit    [_A-Za-z]
 
 digit       [0-9]
@@ -17,11 +19,19 @@ int         [+\-]?{num}
 float       {int}\.{num}
 floate      {int}\.{num}[Ee]{int}
 identifier  {nondigit}({nondigit}|{digit})*
+single_quote '
+double_quote \"
+token       ({int}{identifier})|{identifier}
 
 
 %%
 
 [ \n\t] {}
+
+{anytoken} {
+    yylval.sval = yytext;
+    return ANYTOKEN;
+}
 
 {num} {
     sscanf(yytext, "%d", &yylval.ival);
@@ -81,13 +91,6 @@ identifier  {nondigit}({nondigit}|{digit})*
     return OP;
 }
 
-"'" {
-    return T_SINGLE_QUOTE;
-}
-
-\" {
-    return T_DOUBLE_QUOTE;
-}
 
 "(" {
     return T_LEFT_BRACKET;
@@ -109,15 +112,15 @@ identifier  {nondigit}({nondigit}|{digit})*
     return T_SEMICOLON;
 }
 
+. {
+    printf("yytext: %s, command error!", yytext);
+    return T_ABORT;
+}
 
 <<EOF>> {
     return T_EOF;
 }
 
-. {
-    printf("yytext: %s command error!\n", yytext);
-    return T_ABORT;
-}
 
 
 

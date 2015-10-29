@@ -78,7 +78,8 @@
      NUM = 294,
      P_FLOAT = 295,
      OP = 296,
-     IDENTIFIER = 297
+     IDENTIFIER = 297,
+     ANYTOKEN = 298
    };
 #endif
 /* Tokens.  */
@@ -122,6 +123,7 @@
 #define P_FLOAT 295
 #define OP 296
 #define IDENTIFIER 297
+#define ANYTOKEN 298
 
 
 

@@ -1,5 +1,6 @@
 %{
 #include <cstdio>
+#include <exception>
 #include "common.h"
 extern State parseState;
 
@@ -46,7 +47,7 @@ extern State parseState;
 %token<ival> P_INT NUM
 %token<fval> P_FLOAT
 %token<cval> OP
-%token<sval> IDENTIFIER
+%token<sval> IDENTIFIER ANYTOKEN
 %type<pval> property
 %type<tval>
     start
@@ -80,16 +81,16 @@ start
     }
     | T_ABORT {
         YYABORT;
-    }
+    };
 
 command
     : ddl
     | dml
     | T_EXIT {
-        parseState.type = EXIT;
+        $$.type = EXIT;
     }
     | {
-        parseState.type = EMPTY;
+        $$.type = EMPTY;
     };
 
 ddl
@@ -194,12 +195,8 @@ valueList
     };
 
 value
-    : T_SINGLE_QUOTE IDENTIFIER T_SINGLE_QUOTE {
-        $$.values.push_back(Value($2));
-        $$.type = VALUE;
-    }
-    | T_DOUBLE_QUOTE IDENTIFIER T_DOUBLE_QUOTE {
-        $$.values.push_back(Value($2));
+    : ANYTOKEN {
+        $$.values.push_back(Value($1.substr(1, $1.length() - 2)));
         $$.type = VALUE;
     }
     | P_INT {
@@ -207,8 +204,8 @@ value
         $$.type = VALUE;
     }
     | NUM {
-             $$.values.push_back(Value($1));
-             $$.type = VALUE;
+        $$.values.push_back(Value($1));
+        $$.type = VALUE;
     }
     | P_FLOAT {
         $$.values.push_back(Value($1));
@@ -248,18 +245,8 @@ property
 
 %%
 
-int parse() {
-    do {
-
-    } while (yyparse() == 0 && parseState.type != EMPTY);
-    if (parseState.type == EXIT) {
-        return -1;
-    }
-    return 0;
-}
-
 void yyerror(char const *s) {
-    puts(s);
+    throw s;
 }
 
 int yywrap(void)
