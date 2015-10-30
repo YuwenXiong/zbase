@@ -105,11 +105,9 @@ public:
 				   const vector<AttrInfo> &attrs);
 	RC DropTable(const string &relationName);
 	RC CreateIndex(const string &relationName,
-				   const string &attrName
-				   const string &idxName);
-	RC DropIndex(const string &relationName,
-				 const string &attrName
-				 const string &idxName);
+				   const string &attrName,
+				   const string &indexName);
+	RC DropIndex(const string &indexName);
 				 
 	RC GetAttrInfo(const string &relationName, int attrCount, vector<AttrCatRecord> &attrs);
 	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid);

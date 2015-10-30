@@ -44,6 +44,7 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 		attrRecord.offset = size;
 		attrRecord.attrType = attrs[i].attrType;
 		attrRecord.attrLength = attrs[i].attrLength;
+		attrRecord.property = attrs[i].property;
 		attrRecord.indexNo = -1;
 		if((rc = attrfh.InsertRecord((char*) &attrRecord, rid)) != 0)
 			return rc;
@@ -71,8 +72,12 @@ RC SM_Manager::DropTable(const string &relationName) {
 	RM_Record rec;
 	RelationCatRecord *relRecord;
 	AttrCatRecord *attrRecord;
+	Value value;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, (void*) relationName.c_str())) != 0 )
+	value.type = CHARN;
+	value.strData = relationName;
+
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -100,7 +105,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	if((rc = relfh.DeleteRecord(rid)) != 0)
 		return rc;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, (void*) relationName.c_str())) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -124,7 +129,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	return 0;
 }
 
-RC SM_Manager::CreateIndex(const string &relationName, const string &attrName) {
+RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, const string &indexName) {
 	RC rc;
 	RID rid;
 	AttrCatRecord attrRecord;
@@ -186,7 +191,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName) {
 	return 0;
 }
 
-RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
+RC SM_Manager::DropIndex(const string &indexName) {
 	RM_FileScan rmfs;
 	bool isFound = false;
 	RM_Record rec;
@@ -194,8 +199,12 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 	AttrCatRecord *attrRecord;
 	RID rid;
 	RC rc;
+	Value value;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, (void*) relationName.c_str())) != 0)
+	value.type = CHARN;
+	value.strData = relationName;
+
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
 		return rc;
 
 	while(true) {
@@ -243,8 +252,12 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 	bool isFound = false;
 	RelationCatRecord *relRecord;
 	AttrCatRecord *attrRecord;
+	Value value;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, (void*) relationName.c_str())) != 0)
+	value.type = CHARN;
+	value.strData = relationName;
+
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -273,8 +286,12 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	RM_Record rec;
 	bool isFound = false;
 	AttrCatRecord *attrRecord;
+	Value value;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, attrName), EQ, (void*) attrName.c_str())) != 0)
+	value.type = CHARN;
+	value.strData = attrName;
+
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, attrName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -307,8 +324,12 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	RM_Record rec;
 	bool isFound = false;
 	RelationCatRecord *relRecord;
+	Value value;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, (void*) relationName.c_str())) != 0 )
+	value.type = CHARN;
+	value.strData = relationName;
+
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
