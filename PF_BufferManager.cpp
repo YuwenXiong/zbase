@@ -26,7 +26,7 @@ PF_BufferManager::PF_BufferManager(int _numPages): hashTable(PF_HASH_TABLE_SIZE)
 PF_BufferManager::~PF_BufferManager() {
 }
 
-RC PF_BufferManager::GetPage(uintptr_t fd, PageNum pageNum, char* &buffer, bool multiplePins) {
+RC PF_BufferManager::GetPage(FILE* fd, PageNum pageNum, char* &buffer, bool multiplePins) {
     RC rc;
     int slot;
     if (((rc = hashTable.Find(fd, pageNum, slot)) != 0) && (rc != PF_HASH_NOT_FOUND)) {
@@ -60,7 +60,7 @@ RC PF_BufferManager::GetPage(uintptr_t fd, PageNum pageNum, char* &buffer, bool 
     return RC_OK;
 }
 
-RC PF_BufferManager::AllocatePage(uintptr_t fd, PageNum pageNum, char* &buffer) {
+RC PF_BufferManager::AllocatePage(FILE* fd, PageNum pageNum, char* &buffer) {
     RC rc;
     int slot;
 
@@ -84,7 +84,7 @@ RC PF_BufferManager::AllocatePage(uintptr_t fd, PageNum pageNum, char* &buffer) 
     return RC_OK;
 }
 
-RC PF_BufferManager::MarkDirty(uintptr_t fd, PageNum pageNum) {
+RC PF_BufferManager::MarkDirty(FILE* fd, PageNum pageNum) {
     RC rc;
     int slot;
 
@@ -105,12 +105,15 @@ RC PF_BufferManager::MarkDirty(uintptr_t fd, PageNum pageNum) {
     return RC_OK;
 }
 
-RC PF_BufferManager::UnpinPage(uintptr_t fd, PageNum pageNum) {
+RC PF_BufferManager::UnpinPage(FILE* fd, PageNum pageNum) {
     RC rc;
     int slot;
 
     if ((rc = hashTable.Find(fd, pageNum, slot)) != 0) {
         return rc == PF_HASH_NOT_FOUND ? PF_PAGE_NOT_IN_BUFFER : rc;
+    }
+    if (bufTable[slot].pinCount == 0) {
+        return PF_PAGE_UNPINNED;
     }
     if (--bufTable[slot].pinCount == 0) {
         if ((rc = MakeMRU(slot)) != 0) {
@@ -129,7 +132,7 @@ RC PF_BufferManager::MakeMRU(int slot) {
     return RC_OK;
 }
 
-RC PF_BufferManager::ForcePages(uintptr_t fd, PageNum pageNum) {
+RC PF_BufferManager::ForcePages(FILE* fd, PageNum pageNum) {
     RC rc;
 
     for (const auto &slot: used) {
@@ -143,6 +146,30 @@ RC PF_BufferManager::ForcePages(uintptr_t fd, PageNum pageNum) {
         }
     }
     return RC_OK;
+}
+
+RC PF_BufferManager::FlushPages(FILE *fd) {
+    RC rc, rcWarn = RC_OK;
+    for (auto slot = used.begin(), next = used.begin(); slot != used.end(); slot = next) {
+        next = slot;
+        next++;
+        if (bufTable[*slot].fd == fd) {
+            if (bufTable[*slot].pinCount) {
+                rcWarn = PF_PAGE_PINNED;
+            } else {
+                if (bufTable[*slot].dirty) {
+                    if ((rc = WritePage(fd, bufTable[*slot].pageNum, bufTable[*slot].data))) {
+                        return rc;
+                    }
+                    bufTable[*slot].dirty = false;
+                }
+                if ((rc = hashTable.Delete(fd, bufTable[*slot].pageNum)) || (rc = Unlink(*slot)) || (rc = InsertFree(*slot))) {
+                    return rc;
+                }
+            }
+        }
+    }
+    return rcWarn;
 }
 
 RC PF_BufferManager::InsertFree(int slot) {
@@ -197,37 +224,37 @@ RC PF_BufferManager::InternalAlloc(int &slot) {
 
 }
 
-RC PF_BufferManager::ReadPage(uintptr_t fd, PageNum pageNum, char *dest) {
+RC PF_BufferManager::ReadPage(FILE* fd, PageNum pageNum, char *dest) {
     long offset = pageNum * pageSize + PF_FILE_HEADER_SIZE;
-    if (fseek(reinterpret_cast<FILE *>(fd), offset, SEEK_SET)) {
+    if (fseek(fd, offset, SEEK_SET)) {
         return PF_SYSTEM_ERROR;
     }
-    ssize_t numByte = fread(dest, pageSize, 1, reinterpret_cast<FILE *>(fd));
+    ssize_t numByte = fread(dest, pageSize, 1, fd);
     if (numByte < 0) {
         return PF_SYSTEM_ERROR;
-    } else if (numByte != pageSize) {
+    } else if (numByte != 1) {
         return PF_READ_ERROR;
     } else {
         return RC_OK;
     }
 }
 
-RC PF_BufferManager::WritePage(uintptr_t fd, PageNum pageNum, char *source) {
+RC PF_BufferManager::WritePage(FILE* fd, PageNum pageNum, char *source) {
     long offset = pageNum * pageSize + PF_FILE_HEADER_SIZE;
-    if (fseek(reinterpret_cast<FILE *>(fd), offset, SEEK_SET)) {
+    if (fseek(fd, offset, SEEK_SET)) {
         return PF_SYSTEM_ERROR;
     }
-    ssize_t numByte = fwrite(source, pageSize, 1, reinterpret_cast<FILE *>(fd));
+    ssize_t numByte = fwrite(source, pageSize, 1, fd);
     if (numByte < 0) {
         return PF_SYSTEM_ERROR;
-    } else if (numByte != pageSize) {
+    } else if (numByte != 1) {
         return PF_WRITE_ERROR;
     } else {
         return RC_OK;
     }
 }
 
-RC PF_BufferManager::InitPageDesc(uintptr_t fd, PageNum pageNum, int slot) {
+RC PF_BufferManager::InitPageDesc(FILE* fd, PageNum pageNum, int slot) {
     bufTable[slot].fd = fd;
     bufTable[slot].pageNum = pageNum;
     bufTable[slot].pinCount = 1;

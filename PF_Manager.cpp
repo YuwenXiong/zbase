@@ -29,7 +29,7 @@ RC PF_Manager::CreateFile(const char *fileName) {
     fileHeader.numPages = 0;
 
     size_t numBytes = fwrite(&fileHeader, sizeof(fileHeader), 1, fid);
-    if (numBytes != sizeof(fileHeader)) {
+    if (numBytes != 1) {
         fclose(fid);
         unlink(fileName);
         return PF_SYSTEM_ERROR;
@@ -42,7 +42,7 @@ RC PF_Manager::CreateFile(const char *fileName) {
     return RC_OK;
 }
 
-RC PF_Manager::DestoryFile(const char *fileName) {
+RC PF_Manager::DestroyFile(const char *fileName) {
     if (unlink(fileName) < 0) {
         return PF_SYSTEM_ERROR;
     }
@@ -54,11 +54,11 @@ RC PF_Manager::OpenFile(const char *fileName, PF_FileHandle &fileHandle) {
     if (fileHandle.fileOpen) {
         return PF_FILE_ALREADY_OPEN;
     }
-    if ((fileHandle.fp = fopen(fileName, "r")) == NULL) {
+    if ((fileHandle.fp = fopen(fileName, "r+")) == NULL) {
         return PF_SYSTEM_ERROR;
     }
-    size_t numBytes = fread(&(fileHandle.header), sizeof(fileHandle.header), 1, fileHandle.fp);
-    if (numBytes != sizeof(PF_FileHeader)) {
+    size_t numBytes = fread(&(fileHandle.header), sizeof(PF_FileHeader), 1, fileHandle.fp);
+    if (numBytes != 1) {
         rc = PF_SYSTEM_ERROR;
         fclose(fileHandle.fp);
         fileHandle.fileOpen = false;
@@ -77,7 +77,7 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle) {
     if (!fileHandle.fileOpen) {
         return PF_FILE_ALREADY_CLOSE;
     }
-    if ((rc = fileHandle.ForcePages()) != 0) {
+    if ((rc = fileHandle.FlushPages()) != 0) {
         return rc;
     }
     if (fclose(fileHandle.fp) != 0) {

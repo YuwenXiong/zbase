@@ -46,7 +46,7 @@ RC PF_FileHandle::GetThisPage(PageNum pageNum, PF_PageHandle &pageHandle) const 
         return PF_INVALID_PAGE;
     }
 
-    if ((rc = bufferManager->GetPage(reinterpret_cast<uintptr_t>(fp), pageNum, pageBuf))) {
+    if ((rc = bufferManager->GetPage(fp, pageNum, pageBuf))) {
         return rc;
     }
 
@@ -69,7 +69,7 @@ RC PF_FileHandle::GetNextPage(PageNum current, PF_PageHandle &pageHandle) const 
     }
     // here we cannot check current+1 directly because we throw PF_INVALID_PAGE
     // current = -1 means we want to get the first page
-    if (current != -1 && IsValidPageNum(current)) {
+    if (current != -1 && !IsValidPageNum(current)) {
         return PF_INVALID_PAGE;
     }
     for (current++; current < header.numPages; current++) {
@@ -125,13 +125,13 @@ RC PF_FileHandle::AllocatePage(PF_PageHandle &pageHandle) {
 
     if (header.firstFree != PF_PAGE_LIST_END) {
         pageNum = header.firstFree;
-        if ((rc = bufferManager->GetPage(reinterpret_cast<uintptr_t>(fp), pageNum, pageBuffer))) {
+        if ((rc = bufferManager->GetPage(fp, pageNum, pageBuffer))) {
             return rc;
         }
         header.firstFree = ((PF_PageHeader*)pageBuffer)->nextFree;
     } else {
         pageNum = header.numPages;
-        if ((rc = bufferManager->AllocatePage(reinterpret_cast<uintptr_t>(fp), pageNum, pageBuffer))) {
+        if ((rc = bufferManager->AllocatePage(fp, pageNum, pageBuffer))) {
             return rc;
         }
         header.numPages++;
@@ -165,7 +165,7 @@ RC PF_FileHandle::DisposePage(PageNum pageNum) {
         return PF_INVALID_PAGE;
     }
 
-    if ((rc = bufferManager->GetPage(reinterpret_cast<uintptr_t>(fp), pageNum, pageBuffer))) {
+    if ((rc = bufferManager->GetPage(fp, pageNum, pageBuffer, false))) {
         return rc;
     }
 
@@ -193,7 +193,7 @@ RC PF_FileHandle::MarkDirty(PageNum pageNum) const {
     if (!IsValidPageNum(pageNum)) {
         return PF_INVALID_PAGE;
     }
-    return bufferManager->MarkDirty(reinterpret_cast<uintptr_t>(fp), pageNum);
+    return bufferManager->MarkDirty(fp, pageNum);
 }
 
 RC PF_FileHandle::UnpinPage(PageNum pageNum) const {
@@ -203,7 +203,7 @@ RC PF_FileHandle::UnpinPage(PageNum pageNum) const {
     if (!IsValidPageNum(pageNum)) {
         return PF_INVALID_PAGE;
     }
-    return bufferManager->UnpinPage(reinterpret_cast<uintptr_t>(fp), pageNum);
+    return bufferManager->UnpinPage(fp, pageNum);
 }
 
 RC PF_FileHandle::ForcePages(PageNum pageNum) {
@@ -212,7 +212,7 @@ RC PF_FileHandle::ForcePages(PageNum pageNum) {
     }
 
     if (headerChanged) {
-        if (fseek(fp, 0, L_SET) < 0) {
+        if (fseek(fp, 0, SEEK_SET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&header, sizeof(PF_FileHeader), 1, fp) != 1) {
@@ -220,6 +220,23 @@ RC PF_FileHandle::ForcePages(PageNum pageNum) {
         }
         headerChanged = false;
     }
-    return bufferManager->ForcePages(reinterpret_cast<uintptr_t>(fp), pageNum);
+    return bufferManager->ForcePages(fp, pageNum);
+
+}
+
+RC PF_FileHandle::FlushPages() {
+    if (!fileOpen) {
+        return PF_FILE_CLOSED;
+    }
+    if (headerChanged) {
+        if (fseek(fp, 0, SEEK_SET) < 0) {
+            return PF_SYSTEM_ERROR;
+        }
+        if (fwrite(&header, sizeof(PF_FileHeader), 1, fp) != 1) {
+            return PF_WRITE_ERROR;
+        }
+        headerChanged = false;
+    }
+    return bufferManager->FlushPages(fp);
 
 }

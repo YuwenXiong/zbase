@@ -77,6 +77,7 @@ public:
     RC MarkDirty(PageNum  pageNum) const;
     RC UnpinPage(PageNum pageNum) const;
     RC ForcePages(PageNum pageNum = ALL_PAGES);
+    RC FlushPages();
 
 private:
 
@@ -95,7 +96,7 @@ public:
     PF_Manager();
     ~PF_Manager();
     RC CreateFile(const char *fileName);
-    RC DestoryFile(const char *fileName);
+    RC DestroyFile(const char *fileName);
     RC OpenFile(const char *fileName, PF_FileHandle &fileHandle);
     RC CloseFile(PF_FileHandle &fileHandle);
 private:

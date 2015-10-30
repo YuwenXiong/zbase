@@ -2,6 +2,7 @@
 
 *.iml
 *.o
+PF_TEST.cpp
 
 ## Directory-based project format:
 .idea/

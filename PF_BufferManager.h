@@ -23,7 +23,7 @@ public:
     bool dirty;
     short pinCount;
     PageNum pageNum;
-    uintptr_t fd;
+    FILE* fd;
 };
 
 
@@ -32,11 +32,12 @@ public:
     PF_BufferManager(int numPages);
     ~PF_BufferManager();
 
-    RC GetPage(uintptr_t fd, PageNum pageNum, char* &buffer, bool multiplePins = true);
-    RC AllocatePage(uintptr_t fd, PageNum pageNum, char* &buffer);
-    RC MarkDirty(uintptr_t fd, PageNum pageNum);
-    RC UnpinPage(uintptr_t fd, PageNum pageNum);
-    RC ForcePages(uintptr_t fd, PageNum pageNum);
+    RC GetPage(FILE* fd, PageNum pageNum, char* &buffer, bool multiplePins = true);
+    RC AllocatePage(FILE* fd, PageNum pageNum, char* &buffer);
+    RC MarkDirty(FILE* fd, PageNum pageNum);
+    RC UnpinPage(FILE* fd, PageNum pageNum);
+    RC ForcePages(FILE* fd, PageNum pageNum);
+    RC FlushPages(FILE* fd);
 
 private:
     RC InsertFree(int slot);
@@ -45,10 +46,10 @@ private:
     RC Unlink(int slot);
     RC InternalAlloc(int &slot);
 
-    RC ReadPage(uintptr_t fd, PageNum pageNum, char *dest);
-    RC WritePage(uintptr_t fd, PageNum pageNum, char *source);
+    RC ReadPage(FILE* fd, PageNum pageNum, char *dest);
+    RC WritePage(FILE* fd, PageNum pageNum, char *source);
 
-    RC InitPageDesc(uintptr_t fd, PageNum pageNum, int slot);
+    RC InitPageDesc(FILE* fd, PageNum pageNum, int slot);
 
 
     std::vector<PF_BufferPageDesc> bufTable;
