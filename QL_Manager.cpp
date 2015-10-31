@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "QL.h"
 #include "SM.h"
+#include "QL_Scan.h"
 
 // actually we would query all attrs and only one relation
 RC QL_Manager::Select(const vector <RelationAttr> &selectAttrs, const vector <string> &relations,
@@ -22,8 +23,8 @@ RC QL_Manager::Select(const vector <RelationAttr> &selectAttrs, const vector <st
         return rc;
     }
 
-    if ((rc = ValidateConditions(rcRecord, conditions))) {
-        return QL_WHERE_CLAUSE_ERROR;
+    if ((rc = ValidateConditions(attrs, conditions))) {
+        return QL_INVALID_WHERE_CLAUSE;
     }
 
 
@@ -33,7 +34,7 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> values) {
     RC rc;
     RelationCatRecord rcRecord;
 
-    if ((rc = smManager->GetAttrInfo(relation, rcRecord))) {
+    if ((rc = smManager->GetRelationInfo(relation, rcRecord))) {
         return rc;
     }
 
@@ -46,12 +47,12 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> values) {
     memset(tupleData, 0, sizeof(char) * rcRecord.tupleLength);
 
     if (values.size() != rcRecord.tupleLength) {
-        return QL_ATTR_COUNT_ERROR;
+        return QL_INVALID_ATTR_COUNT;
     }
 
     for (int i = 0; i < values.size(); i++) {
         if (values[i].type != attrs[i].attrType) {
-            return QL_ATTR_TYPE_ERROR;
+            return QL_INVALID_ATTR_TYPE;
         }
     }
 
@@ -152,7 +153,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         }
     }
 
-    shared_ptr<QL_Op> scanOp;
+    shared_ptr<QL_ScanHandle> scanOp;
 
     RM_FileHandle rmFH;
     RID rid;
@@ -161,17 +162,25 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
     if ((rc = rmManager->OpenFile(relation, rmFH))) {
         return rc;
     }
-    string attrName = conditions[0].lAttr;
-    CmpOp op = conditions[0].op;
-    AttrCatRecord attrData;
-    smManager->GetAttrInfo(relation, attrName, attrData);
     if (indexPos != -1) {
-        scanOp.Reset(new QL_IndexScanOp(smManager, ixManager, rmManager, relation, attrName, op, &conditions[indexPos].rValue));
+        string attrName = conditions[indexPos].lAttr;
+        CmpOp op = conditions[indexPos].op;
+        AttrCatRecord attrData;
+        smManager->GetAttrInfo(relation, attrName, attrData);
+        scanOp.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, attrName, op, conditions[indexPos].rValue));
     } else {
-        scanOp.Reset(new QL_FileScanOp(smManager, rmManager, relation, true, attrName, op, &conditions[0].rValue));
+        if (conditions.size() > 0) {
+            string attrName = conditions[0].lAttr;
+            CmpOp op = conditions[0].op;
+            AttrCatRecord attrData;
+            smManager->GetAttrInfo(relation, attrName, attrData);
+            scanOp.reset(new QL_FileScanHandle(smManager, rmManager, relation, attrName, op, conditions[0].rValue));
+        } else {
+            scanOp.reset(new QL_FileScanHandle(smManager, rmManager, relation));
+        }
     }
 
-    if (rc = scanOp->Open()) {
+    if ((rc = scanOp->Open())) {
         return rc;
     }
 
@@ -184,7 +193,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         }
     }
 
-    while ((rc = scanOp->GetNext(rid)) != EOF) {
+    while (scanOp->GetNext(rid) != EOF) {
         if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(recordData))) {
             return rc;
         }
@@ -228,12 +237,12 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
     if ((rc = scanOp->Close()) || (rc = rmManager->CloseFile(rmFH))) {
         return rc;
     }
-
+    return RC_OK;
 }
 
 bool QL_Manager::MatchConditions(char *recordData, const vector<AttrCatRecord> &attrs,
                                  const vector<Condition> &conditions) {
-    AttrCatRecord lacRecord, racRecord;
+    AttrCatRecord lacRecord;
     string relation = attrs[0].relationName;
     for (int i = 0; i < conditions.size(); i++) {
         string lAttr = conditions[i].lAttr;
@@ -266,7 +275,7 @@ bool QL_Manager::MatchConditions(char *recordData, const vector<AttrCatRecord> &
 
 
 template<class T>
-bool matchRecord(const T &lValue, const T &rValue, CmpOp op) {
+bool QL_Manager::matchRecord(const T &lValue, const T &rValue, CmpOp op) {
     switch (op) {
         case EQ:
             return lValue == rValue;
@@ -284,4 +293,20 @@ bool matchRecord(const T &lValue, const T &rValue, CmpOp op) {
             assert(0);
             return false;
     }
+}
+
+RC QL_Manager::ValidateConditions(const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions) {
+    for (int i = 0; i < conditions.size(); i++) {
+        bool found = false;
+        for (int j = 0; j < attrs.size(); j++) {
+            if (attrs[j].attrName == conditions[i].lAttr && attrs[j].attrType == conditions[i].rValue.type) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return QL_INVALID_WHERE_CLAUSE;
+        }
+    }
+    return RC_OK;
 }

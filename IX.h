@@ -18,8 +18,8 @@ class IX_IndexHandle {
 public:
     IX_IndexHandle();
     ~IX_IndexHandle();
-    RC InsertEntry(Value &data, const RID &rid);
-    RC DeleteEntry(Value &data, const RID &rid);
+    RC InsertEntry(const Value &data, const RID &rid);
+    RC DeleteEntry(const Value &data, const RID &rid);
     RC ForcePages();
 private:
     B_Tree b_tree;
