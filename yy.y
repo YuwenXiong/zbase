@@ -126,9 +126,8 @@ createIndex
     };
 
 dropIndex
-    : T_DROP T_INDEX IDENTIFIER T_LEFT_BRACKET IDENTIFIER T_RIGHT_BRACKET {
+    : T_DROP T_INDEX IDENTIFIER {
         $$.type = DROPINDEX;
-        $$.relationName = $5;
         $$.indexName = $3;
     };
 

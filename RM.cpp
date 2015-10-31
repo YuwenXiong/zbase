@@ -236,6 +236,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return rc;
 }
 
+
 RC RM_FileScan::OpenScan(RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
                          Value value) {
     if(open)return RM_FILESCAN_ALREADY_OPEN;

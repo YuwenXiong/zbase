@@ -18,9 +18,9 @@ class IX_IndexHandle {
     friend class IX_Manager;
     friend class IX_IndexScan;
 public:
-
     RC InsertEntry(Value &data, const RID &rid);
     RC DeleteEntry(Value &data, const RID &rid);
+
 private:
     B_Tree b_tree;
 
@@ -28,7 +28,6 @@ private:
 
 class IX_IndexScan {
 public:
-
     RC OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& value);
     RC GetNextEntry(RID &rid);
     RC CloseScan();
