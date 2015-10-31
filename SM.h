@@ -11,8 +11,8 @@
 #include "RM.h"
 using namespace std;
 
-#define SM_NOTFOUND -1
-#define SM_INDEXEXISTS -2
+const RC SM_NOTFOUND = SM_RC -1;
+const RC SM_INDEXEXISTS = SM_RC -2;
 
 class SM_Manager {
 private:
