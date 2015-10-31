@@ -5,7 +5,11 @@
 #ifndef ZBASE_QL_H
 #define ZBASE_QL_H
 
+#include <vector>
 #include "zbase.h"
+#include "RM.h"
+#include "IX.h"
+#include "SM.h"
 
 class QL_Manager {
 public:
@@ -21,5 +25,9 @@ private:
 };
 
 
+// warning
+const RC QL_WHERE_CLAUSE_ERROR = QL_RC - 1;
+const RC QL_ATTR_COUNT_ERROR = QL_RC - 2;
+const RC QL_ATTR_TYPE_ERROR = QL_RC - 3;
 
 #endif //ZBASE_QL_H
