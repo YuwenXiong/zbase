@@ -19,7 +19,13 @@ const RC RC_OK = 0;
 
 const RC PF_RC = 100;
 const RC RM_RC = 200;
+<<<<<<< HEAD
 const RC IX_RC =300;
+=======
+const RC IX_RC = 300;
+const RC SM_RC = 400;
+const RC QL_RC = 500;
+>>>>>>> origin/master
 
 const int ALL_PAGES = -1;
 const int NULL_PAGE=-2;
@@ -46,6 +52,7 @@ struct AttrInfo {
     int attrLength;
     Property property;
     AttrInfo(string n, AttrType t, int l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
+    AttrInfo(){};
 };
 
 struct RelationCatRecord {
@@ -60,7 +67,7 @@ struct AttrCatRecord {
     string attrName;
     int offset;
     AttrType attrType;
-    int attrLength;
+    size_t attrLength;
     int indexNo;
     Property property;
 };
@@ -70,6 +77,9 @@ struct Value {
     int iData;
     float fData;
     string strData;
+    Value(){
+
+    }
     Value(int x): iData(x) {
         type = INT;
     }
