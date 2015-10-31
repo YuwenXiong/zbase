@@ -323,6 +323,43 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 	return 0;
 }
 
+RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData) {
+	RM_FileScan rmfs;
+	RC rc;
+	RM_Record rec;
+	bool isFound = false;
+	AttrCatRecord *attrRecord;
+	Value value;
+
+	value.type = CHARN;
+	value.strData = attrName;
+
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, attrName), EQ, value)) != 0)
+		return rc;
+	while(true) {
+		rc = rmfs.GetNextRecord(rec);
+		if(rc == RM_EOF)
+			break;
+		if(rc != 0)
+			return rc;
+
+		rec.GetData((char*&) attrRecord);
+		if(attrRecord->attrName == attrName) {
+			isFound = true;
+			break;
+		}
+	}
+	if((rc = rmfs.CloseScan()) != 0)
+		return rc;
+
+	if(!isFound)
+		return SM_NOTFOUND;
+
+	attrData = *attrRecord;
+
+	return 0;
+}
+
 RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid) {
 	RM_FileScan rmfs;
 	RC rc;
@@ -357,6 +394,43 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 		return SM_NOTFOUND;
 
 	attrData = *attrRecord;
+
+	return 0;
+}
+
+RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &relationData) {
+	RM_FileScan rmfs;
+	RC rc;
+	RM_Record rec;
+	bool isFound = false;
+	RelationCatRecord *relRecord;
+	Value value;
+
+	value.type = CHARN;
+	value.strData = relationName;
+
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
+		return rc;
+	while(true) {
+		rc = rmfs.GetNextRecord(rec);
+		if(rc == RM_EOF)
+			break;
+		if(rc != 0)
+			return rc;
+
+		rec.GetData((char*&) relRecord);
+		if(relRecord->relationName == relationName) {
+			isFound = true;
+			break;
+		}
+	}
+	if((rc = rmfs.CloseScan()) != 0)
+		return rc;
+
+	if(!isFound)
+		return SM_NOTFOUND;
+
+	relationData = *relRecord;
 
 	return 0;
 }

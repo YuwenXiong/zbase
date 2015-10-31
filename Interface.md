@@ -111,7 +111,9 @@ public:
 	RC DropIndex(const string &relationName, const string &attrName);
 				 
 	RC GetAttrInfo(const string &relationName, int attrCount, vector<AttrCatRecord> &attrs);
+	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData);
 	RC GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData, RID &rid);
+	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData);
 	RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData, RID &rid);
 }
 
