@@ -19,13 +19,10 @@ const RC RC_OK = 0;
 
 const RC PF_RC = 100;
 const RC RM_RC = 200;
-<<<<<<< HEAD
-const RC IX_RC =300;
-=======
 const RC IX_RC = 300;
 const RC SM_RC = 400;
 const RC QL_RC = 500;
->>>>>>> origin/master
+
 
 const int ALL_PAGES = -1;
 const int NULL_PAGE=-2;
