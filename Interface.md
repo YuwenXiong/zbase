@@ -199,7 +199,6 @@ public:
 	~IX_IndexHandle();
 	RC InsertEntry(Value &Data, const RID &rid);
 	RC DeleteEntry(Value &data, const RID &rid);
-	RC ForcePages();
 };
 
 class IX_IndexScan {

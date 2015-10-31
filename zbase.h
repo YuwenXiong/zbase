@@ -19,6 +19,7 @@ const RC RC_OK = 0;
 
 const RC PF_RC = 100;
 const RC RM_RC = 200;
+const RC IX_RC =300;
 
 const int ALL_PAGES = -1;
 const int NULL_PAGE=-2;
