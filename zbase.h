@@ -72,6 +72,9 @@ struct Value {
     int iData;
     float fData;
     string strData;
+    Value(){
+
+    }
     Value(int x): iData(x) {
         type = INT;
     }

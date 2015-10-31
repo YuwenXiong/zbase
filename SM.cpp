@@ -95,7 +95,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
-	if(isFound == false)
+	if(!isFound)
 		return SM_NOTFOUND;
 
 	if((rc = rmm.DestoryFile(relationName)) != 0)
@@ -139,24 +139,31 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	RM_FileHandle rmfh;
 	RM_FileScan rmfs;
 	char *pdata;
+	AttrCatRecord *pdata1;
+	RelationCatRecord *pdata2;
+	string s;
+	Value value, data;
 
 	if((rc = GetAttrInfo(relationName, attrName, attrRecord, rid)) != 0)
 		return rc;
-
 	if(attrRecord.indexNo != -1)
 		return SM_INDEXEXISTS;
-
-	attrRecord.indexNo = attrRecord.offset;
 	if((rc = attrfh.GetRecord(rid, rec)) != 0)
 		return rc;
+	rec.GetData((char*&) pdata1);
+	pdata1->indexNo = attrRecord.offset;
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
 		return rc;
 
+	s = relationName + "," + attrName;
+	mapIndexName[indexName] = s;
+
 	if((rc = GetRelationInfo(relationName, relRecord, rid)) != 0)
 		return rc;
-	relRecord.indexCount++;
 	if((rc = relfh.GetRecord(rid, rec)) != 0)
 		return rc;
+	rec.GetData((char*&) pdata2);
+	pdata2->indexCount++;
 	if((rc = relfh.UpdateRecord(rec)) != 0)
 		return rc;
 
@@ -166,7 +173,8 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return rc;
 	if((rc = rmm.OpenFile(relationName, rmfh)) != 0)
 		return rc;
-	if((rc = rmfs.OpenScan(rmfh, attrRecord.attrType, attrRecord.attrLength, attrRecord.offset, NO, NULL)) != 0)
+	value.type = attrRecord.attrType;
+	if((rc = rmfs.OpenScan(rmfh, attrRecord.attrType, attrRecord.attrLength, attrRecord.offset, NO, value)) != 0)
 		return rc;
 
 	while(true) {
@@ -178,24 +186,50 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 
 		rec.GetData(pdata);
 		rec.GetRid(rid);
-		ixh.InsertEntry(pdata + attrRecord.offset, rid);
+		data.type = attrRecord.attrType;
+		if(data.type == INT)
+			data.iData = *(int *)(pdata + attrRecord.offset);
+		else if(data.type == FLOAT)
+			data.fData = *(float *)(pdata + attrRecord.offset);
+		else if(data.type == CHARN)
+			data.strData = pdata + attrRecord.offset;
+		ixh.InsertEntry(data, rid);
 	}
 
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 	if((rc = rmm.CloseFile(rmfh)) != 0)
 		return rc;
-	if((rc = ixm.CloseIndxe(ixh)) != 0)
+	if((rc = ixm.CloseIndex(ixh)) != 0)
 		return rc;
 
 	return 0;
 }
 
 RC SM_Manager::DropIndex(const string &indexName) {
+	string s, relationName, attrName;
+	int x;
+
+	if(mapIndexName.find(indexName) != mapIndexName.end())
+		s = mapIndexName[indexName];
+	else
+		return SM_NOTFOUND;
+
+	x = s.find(",");
+	relationName = s.substr(0, x);
+	attrName = s.substr(x+1);
+
+	DropIndex(relationName, attrName);
+
+	return 0;
+}
+
+RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 	RM_FileScan rmfs;
 	bool isFound = false;
 	RM_Record rec;
 	RelationCatRecord relRecord;
+	RelationCatRecord *pdata;
 	AttrCatRecord *attrRecord;
 	RID rid;
 	RC rc;
@@ -224,7 +258,7 @@ RC SM_Manager::DropIndex(const string &indexName) {
 
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
-	if(isFound == false)
+	if(!isFound)
 		return SM_NOTFOUND;
 
 	rec.GetRid(rid);
@@ -236,9 +270,10 @@ RC SM_Manager::DropIndex(const string &indexName) {
 
 	if((rc = GetRelationInfo(relationName, relRecord, rid)) != 0)
 		return rc;
-	relRecord.indexCount--;
 	if((rc = relfh.GetRecord(rid, rec)) != 0)
 		return rc;
+	rec.GetData((char*&) pdata);
+	pdata->indexCount--;
 	if((rc = relfh.UpdateRecord(rec)) != 0)
 		return rc;
 
@@ -268,13 +303,14 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 
 		rec.GetData((char*&) attrRecord);
 		if(attrRecord->relationName == relationName) {
+			isFound = true;
 			attrs.push_back(*attrRecord);
 		}
 	}
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
-	if(isFound == false)
+	if(!isFound)
 		return SM_NOTFOUND;
 
 	return 0;
@@ -310,7 +346,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
-	if(isFound == false)
+	if(!isFound)
 		return SM_NOTFOUND;
 
 	attrData = *attrRecord;
@@ -348,7 +384,7 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
-	if(isFound == false)
+	if(!isFound)
 		return SM_NOTFOUND;
 
 	relationData = *relRecord;
