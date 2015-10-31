@@ -143,6 +143,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	RelationCatRecord *pdata2;
 	string s;
 	Value value, data;
+	map<string, string> m;
 
 	if((rc = GetAttrInfo(relationName, attrName, attrRecord, rid)) != 0)
 		return rc;
@@ -155,8 +156,10 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
 		return rc;
 
+	mapGet(m);
 	s = relationName + "," + attrName;
-	mapIndexName[indexName] = s;
+	m[indexName] = s;
+	mapSave(m);
 
 	if((rc = GetRelationInfo(relationName, relRecord, rid)) != 0)
 		return rc;
@@ -209,11 +212,15 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 RC SM_Manager::DropIndex(const string &indexName) {
 	string s, relationName, attrName;
 	int x;
+	map<string, string> m;
 
-	if(mapIndexName.find(indexName) != mapIndexName.end())
-		s = mapIndexName[indexName];
+	mapGet(m);
+	if(m.find(indexName) != m.end())
+		s = m[indexName];
 	else
 		return SM_NOTFOUND;
+	m.erase(indexName);
+	mapSave(m);
 
 	x = s.find(",");
 	relationName = s.substr(0, x);
@@ -390,4 +397,33 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	relationData = *relRecord;
 
 	return 0;
+}
+
+void mapSave(const map<string, string> &m) {
+	ofstream fout("mapIndex");
+
+	for(auto it = m.begin(); it != m.end(); it++) {
+		fout << it->first << " " << it->second << endl;
+	}
+
+	fout.close();
+}
+
+void mapGet(map<string, string> &m) {
+	string s1, s2;
+	ifstream fin("mapIndex");
+
+	if(!fin) {
+		ofstream fout("mapIndex");
+		fout.close();
+		ifstream fin("mapIndex");
+	}
+
+	while(fin) {
+		fin >> s1;
+		fin >> s2;
+		m[s1] = s2;
+	}
+
+	fin.close();
 }

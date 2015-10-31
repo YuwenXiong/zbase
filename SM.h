@@ -6,6 +6,7 @@
 #define ZBASE_SM_H
 
 #include <vector>
+#include <fstream>
 #include <map>
 #include "IX.h"
 #include "RM.h"
@@ -20,7 +21,6 @@ private:
     RM_Manager rmm;
     RM_FileHandle relfh;
     RM_FileHandle attrfh;
-    map<string, string> mapIndexName;
 
 public:
     SM_Manager(IX_Manager &ixm, RM_Manager &rmm);
@@ -37,5 +37,7 @@ public:
     RC GetRelationInfo(const string &relationName, RelationCatRecord &relationData, RID &rid);
 };
 
+void mapSave(const map<string, string> &m);
+void mapGet(map<string, string> &m);
 
 #endif //ZBASE_SM_H
