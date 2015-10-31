@@ -236,7 +236,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return rc;
 }
 
-RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
+RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, size_t attrLength, int attrOffset, CmpOp op,
                          Value value) {
     if(open)return RM_FILESCAN_ALREADY_OPEN;
     if(fileHandle.header.lastFreeSlot==RID(0,0))return RM_SCAN_EMPTY_RECORD;

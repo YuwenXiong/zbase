@@ -19,6 +19,9 @@ public:
     RC Insert(const string &relation, const vector<Value> values);
     RC Delete(const string &relation, const vector<Condition> conditions);
 private:
+
+    bool MatchConditions(char* recordData, const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions);
+
     SM_Manager* smManager;
     IX_Manager* ixManager;
     RM_Manager* rmManager;

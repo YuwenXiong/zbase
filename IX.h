@@ -31,7 +31,7 @@ class IX_IndexScan {
 public:
     IX_IndexScan();
     ~IX_IndexScan();
-    RC OpenScan(const IX_IndexHandle &indexHandle, CmpOp op, void* value);
+    RC OpenScan(const IX_IndexHandle &indexHandle, CmpOp op, Value &value);
     RC GetNextEntry(RID &rid);
     RC CloseScan();
 };

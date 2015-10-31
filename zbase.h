@@ -45,7 +45,7 @@ enum Property {
 struct AttrInfo {
     string attrName;
     AttrType attrType;
-    int attrLength;
+    size_t attrLength;
     Property property;
     AttrInfo(string n, AttrType t, int l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
     AttrInfo(){};
@@ -53,7 +53,7 @@ struct AttrInfo {
 
 struct RelationCatRecord {
     string relationName;
-    int tupleLength; // byte size of tuple, used by Record Manager
+    size_t tupleLength; // byte size of tuple, used by Record Manager
     int attrCount;
     int indexCount;
 };

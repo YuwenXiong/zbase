@@ -189,12 +189,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
             return rc;
         }
 
-        bool match;
-        if ((rc = MatchCondition(recordData, match, attrs, conditions))) {
-            return rc;
-        }
-
-        if (match) {
+        if (MatchConditions(recordData, attrs, conditions)) {
             if ((rc = rmFH.DeleteRecord(rid))) {
                 return rc;
             }
@@ -236,11 +231,42 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
 
 }
 
-
+bool QL_Manager::MatchConditions(char *recordData, const vector<AttrCatRecord> &attrs,
+                                 const vector<Condition> &conditions) {
+    AttrCatRecord lacRecord, racRecord;
+    string relation = attrs[0].relationName;
+    for (int i = 0; i < conditions.size(); i++) {
+        string lAttr = conditions[i].lAttr;
+        smManager->GetAttrInfo(relation, lAttr, lacRecord);
+        switch (lacRecord.attrType) {
+            case INT: {
+                int lValue;
+                memcpy(&lValue, recordData + (lacRecord.offset), sizeof(lValue));
+                if (!matchRecord(lValue, conditions[i].rValue.iData, conditions[i].op)) {
+                    return false;
+                }
+            }
+            case FLOAT: {
+                float lValue;
+                memcpy(&lValue, recordData + (lacRecord.offset), sizeof(lValue));
+                if (!matchRecord(lValue, conditions[i].rValue.fData, conditions[i].op)) {
+                    return false;
+                }
+            }
+            case CHARN: {
+                string lValue(recordData + (lacRecord.offset));
+                if (!matchRecord(lValue, conditions[i].rValue.strData, conditions[i].op)) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 
 
 template<class T>
-bool matchRecord(T lValue, T rValue, CmpOp op) {
+bool matchRecord(const T &lValue, const T &rValue, CmpOp op) {
     switch (op) {
         case EQ:
             return lValue == rValue;

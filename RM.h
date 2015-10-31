@@ -92,7 +92,7 @@ class RM_FileScan {
 public:
     RM_FileScan();
     ~RM_FileScan();
-    RC OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, Value value);
+    RC OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, size_t attrLength, int attrOffset, CmpOp op, Value value);
     RC GetNextRecord(RM_Record &record);
     RC CloseScan();
 private:
