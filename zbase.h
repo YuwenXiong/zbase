@@ -62,7 +62,7 @@ struct AttrCatRecord {
     string attrName;
     int offset;
     AttrType attrType;
-    int attrLength;
+    size_t attrLength;
     int indexNo;
     Property property;
 };
