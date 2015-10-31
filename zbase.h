@@ -48,6 +48,7 @@ struct AttrInfo {
     int attrLength;
     Property property;
     AttrInfo(string n, AttrType t, int l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
+    AttrInfo(){};
 };
 
 struct RelationCatRecord {
