@@ -18,6 +18,19 @@ typedef int SlotNum;
 
 const size_t FIRST_SLOT=sizeof(PF_PageHeader);
 const size_t RM_RECORD_HEADER_OFFSET=sizeof(PF_FileHeader);
+class RID {
+public:
+
+
+    RID(PageNum pageNum =NULL_PAGE, SlotNum slotNum=NULL_SLOT);
+    RC GetPageNum(PageNum &pageNum) const;
+    RC GetSlotNum(SlotNum &slotNum) const;
+    bool operator==(const RID &rid)const;
+    bool operator>=(const RID &rid)const;
+private:
+    PageNum pageNum;
+    SlotNum slotNum;
+};
 struct RM_RecordFileHeader{
     int slotPerPage;
     int recordSize;
@@ -29,24 +42,12 @@ struct RM_SlotHeader{
     bool empty;
     RID nextFreeSlot;
 };
-class RID {
-public:
 
-    ~RID();
-    RID(PageNum pageNum =NULL_PAGE, SlotNum slotNum=NULL_SLOT);
-    RC GetPageNum(PageNum &pageNum) const;
-    RC GetSlotNum(SlotNum &slotNum) const;
-    bool operator==(const RID &rid)const;
-    bool operator>=(const RID &rid)const;
-private:
-    PageNum pageNum;
-    SlotNum slotNum;
-};
 
 class RM_Record {
     friend class RM_FileHandle;
 public:
-    RM_Record();
+
     RM_Record(int recordSize,RID rid);
     ~RM_Record();
     RC GetData(char* &data) const;
@@ -60,9 +61,7 @@ class RM_FileHandle {
     friend class RM_Manager;
     friend class RM_FileScan;
 public:
-    RM_FileHandle();
-    ~RM_FileHandle();
-    RC GetRecord(const RID &rid, RM_Record &rec) const;
+    RC GetRecord(const RID &rid, RM_Record &rec);
     RC InsertRecord(const char* data, RID &rid);
     RC DeleteRecord(const RID &rid);
     RC UpdateRecord(const RM_Record &record);
@@ -78,9 +77,8 @@ private:
 class RM_Manager {
 public:
     RM_Manager (PF_Manager &pfm);
-    ~RM_Manager();
     RC CreateFile(const string &fileName, int recordSize);
-    RC DestoryFile(const string &fileName);
+    RC DestroyFile(const string &fileName);
     RC OpenFile(const string &fileName, RM_FileHandle &fileHandle);
     RC CloseFile(RM_FileHandle &fileHandle);
 private:
@@ -91,8 +89,7 @@ private:
 class RM_FileScan {
 public:
     RM_FileScan();
-    ~RM_FileScan();
-    RC OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, Value value);
+    RC OpenScan(RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, Value value);
     RC GetNextRecord(RM_Record &record);
     RC CloseScan();
 private:
@@ -102,7 +99,7 @@ private:
     int offset;
     Value value;
     CmpOp op;
-    bool open=false;
+    bool open;
     RC UpdateRID();
     bool IsValid(RM_Record &record);
 

@@ -101,8 +101,8 @@ RC RM_Manager::OpenFile(const string &fileName, RM_FileHandle &fileHandle) {
     return RC_OK;
 
 }
-RC RM_Manager::DestoryFile(const string &fileName) {
-    return pfm->DestoryFile(fileName.c_str());
+RC RM_Manager::DestroyFile(const string &fileName) {
+    return pfm->DestroyFile(fileName.c_str());
 
 }
 RC RM_Manager::CloseFile(RM_FileHandle &fileHandle) {
@@ -111,7 +111,7 @@ RC RM_Manager::CloseFile(RM_FileHandle &fileHandle) {
     return pfm->CloseFile(fileHandle.pffh);
 }
 
-RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) const {
+RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
@@ -236,7 +236,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return rc;
 }
 
-RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
+RC RM_FileScan::OpenScan(RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
                          Value value) {
     if(open)return RM_FILESCAN_ALREADY_OPEN;
     if(fileHandle.header.lastFreeSlot==RID(0,0))return RM_SCAN_EMPTY_RECORD;
@@ -353,6 +353,8 @@ RC RM_FileScan::UpdateRID() {
 }
 
 
-
+RM_FileScan::RM_FileScan(){
+    open=false;
+}
 
 

@@ -4,10 +4,13 @@
 
 #ifndef ZBASE_B_TREE_H
 #include "zbase.h"
+#include "PF.h"
+#include "RM.h"
 enum BINSRT {B_NRML, B_OVRFLW};
 enum BDEL {B_NONE, B_UNDRFLW, B_NOTFOUND};
 
-
+class B_Node;
+class B_Entry;
 
 
 struct  B_TreeHeader{
@@ -39,7 +42,6 @@ private:
 
 public:
     B_Tree();
-    ~B_Tree();
     RC Init();
     RC LoadRoot();
     RC DelRoot();
@@ -50,6 +52,35 @@ public:
 
 };
 
+
+
+class B_Entry{
+    friend class B_Node;
+    friend class IX_IndexHandle;
+    friend class B_Tree;
+    friend class IX_IndexScan;
+private:
+    int level;
+    PageNum son;
+    int ikey;
+    float fkey;
+    string skey;
+    RID rid;
+    B_Node* son_ptr;
+    B_Tree* b_tree;
+public:
+    ~B_Entry();
+    RC Init(B_Tree* b_tree1, const int& level);
+    RC ReadFromPage(char* data);
+    RC WriteToPage(char* data);
+    RC SetFromSon(B_Node* sonNode);
+    RC SetFromEntry(B_Entry* b_entry);
+    B_Node* GetSon();
+    RC DeleteSon();
+    bool IsSameRecord(B_Entry* b_entry);
+    bool Compare(CmpOp op,B_Entry* b_entry);
+
+};
 class B_Node{
     friend class B_Tree;
     friend class B_Entry;
@@ -80,36 +111,6 @@ public:
     RC RemoveEntry(int pos);
     RC AddNewSon(B_Node* b_node);
 };
-
-class B_Entry{
-    friend class B_Node;
-    friend class IX_IndexHandle;
-    friend class B_Tree;
-    friend class IX_IndexScan;
-private:
-    int level;
-    pageNum son;
-    pageNum leafSon;
-    int ikey;
-    float fkey;
-    string skey;
-    RID rid;
-    B_Node* son_ptr;
-    B_Tree* b_tree;
-public:
-    ~B_Entry();
-    RC Init(B_Tree* b_tree1, const int& level);
-    RC ReadFromPage(char* data);
-    RC WriteToPage(char* data);
-    RC SetFromSon(B_Node* sonNode);
-    RC SetFromEntry(B_Entry* b_entry);
-    B_Node* GetSon();
-    RC DeleteSon();
-    bool IsSameRecord(B_Entry* b_entry);
-    bool Compare(CmpOp op,B_Entry* b_entry);
-
-};
-
 #define ZBASE_B_TREE_H
 
 #endif //ZBASE_B_TREE_H

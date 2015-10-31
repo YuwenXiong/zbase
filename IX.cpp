@@ -28,7 +28,7 @@ RC IX_IndexHandle::DeleteEntry(Value &data, const RID &rid){
 IX_Manager::IX_Manager(PF_Manager &pfm1) {
     pfm=&pfm1;
 }
-RC IX_IndexScan::OpenScan(const IX_IndexHandle &indexHandle, CmpOp op, Value& data){
+RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& data){
     ixh=&indexHandle;
     AttrType type=ixh->b_tree.header.type;
     cmpEntry=new B_Entry;
@@ -156,8 +156,9 @@ RC IX_Manager::CreateIndex(const string &fileName, int indexNo, AttrType attrTyp
 
 RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &indexHandle) {
     RC rc;
-    if(rc=pfm->OpenFile(fileName.c_str(),indexHandle.b_tree.pffh)!=0)
-        return rc;
+    if(rc=pfm->OpenFile(fileName.c_str(),indexHandle.b_tree.pffh))
+        return rc==PF_FILE_ALREADY_OPEN?IX_INDEX_ALREADY_OPEN:IX_INDEX_NOT_FOUND;
+
     size_t numBytes = fread(&(indexHandle.b_tree.header), sizeof(indexHandle.b_tree.header), 1, indexHandle.b_tree.pffh.fp);
     if (numBytes != sizeof(B_TreeHeader)) {
         rc = PF_SYSTEM_ERROR;
@@ -173,7 +174,11 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
         return rc;
     return 0;
 }
-
+RC IX_Manager::DestoryIndex(const string &fileName, int indexNo){
+    RC rc;
+    if(rc=pfm->DestroyFile(fileName.c_str()))
+    return rc;
+}
 
 RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
     RC rc;
