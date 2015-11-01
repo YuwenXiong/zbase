@@ -125,7 +125,7 @@ RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
         return rc;
     if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty)
         return RM_READ_EMPTY_SLOT;
- //   rec=RM_Record(header.recordSize,rid);
+    rec=RM_Record(header.recordSize,rid);
     memcpy(rec.data,pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),header.recordSize);
     return 0;
 }
