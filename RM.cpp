@@ -223,7 +223,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return PF_FILE_CLOSED;
     }
     if (headerChanged) {
-        if (fseek(pffh.fp, 0,RM_RECORD_HEADER_OFFSET) < 0) {
+        if (fseek(pffh.fp,RM_RECORD_HEADER_OFFSET, SEEK_SET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&header, sizeof(RM_RecordFileHeader), 1, pffh.fp) != 1) {
