@@ -15,9 +15,13 @@ int main() {
     attrs.push_back(s1);
     attrs.push_back(s2);
 
+    if((rc = smm.createDb("myDB")) != 0)
+        return rc;
     if((rc = smm.OpenDb("myDB")) != 0)
         return rc;
     if((rc = smm.CreateTable(relationName, attrs)) != 0)
+        return rc;
+    if((rc = smm.CloseDb()) != 0)
         return rc;
 
     cout << "hello" << endl;

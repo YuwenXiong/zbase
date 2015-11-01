@@ -9,6 +9,17 @@ SM_Manager::~SM_Manager() {
 
 }
 
+RC SM_Manager::createDb(const string &dbName) {
+	RC rc;
+
+	if((rc = rmm.CreateFile("relcat", sizeof(RelationCatRecord))) != 0)
+		return rc;
+	if((rc = rmm.CreateFile("attrcat", sizeof(AttrCatRecord))) != 0)
+		return rc;
+
+	return 0;
+}
+
 RC SM_Manager::OpenDb(const string &dbName) {
 	RC rc;
 
