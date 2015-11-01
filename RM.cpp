@@ -129,8 +129,11 @@ RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
         return RM_READ_EMPTY_SLOT;
     rec=RM_Record(header.recordSize,rid);
     memcpy(rec.data,pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),header.recordSize);
+    if((rc=pffh.UnpinPage(pageNum)))
+        return rc;
     return 0;
 }
+
 RC RM_FileHandle::DeleteRecord(const RID &rid) {
     PageNum pageNum;
     SlotNum slotNum;
@@ -152,8 +155,11 @@ RC RM_FileHandle::DeleteRecord(const RID &rid) {
 
     if((rc=pffh.MarkDirty(pageNum)))
         return rc;
+    if((rc=pffh.UnpinPage(pageNum)))
+        return rc;
     return 0;
 }
+
 
 RC RM_FileHandle::UpdateRecord(const RM_Record &record) {
     RID rid;
@@ -170,6 +176,8 @@ RC RM_FileHandle::UpdateRecord(const RM_Record &record) {
         return rc;
     memcpy(pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),record.data,header.recordSize);
     if((rc=pffh.MarkDirty(pageNum)))
+        return rc;
+    if((rc=pffh.UnpinPage(pageNum)))
         return rc;
     return 0;
 }
@@ -216,6 +224,8 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     memcpy(pfph.pageData+slotNumF*header.slotSize+sizeof(RM_SlotHeader),data,header.recordSize);
     rid=RID(pageNumF,slotNumF);
     if((rc=pffh.MarkDirty(pageNumF)))
+        return rc;
+    if((rc=pffh.UnpinPage(pageNumF)))
         return rc;
     return 0;
 
@@ -313,10 +323,7 @@ bool RM_FileScan::IsValid(RM_Record &record){
         }
     }
     if(type==CHARN){
-        char* recC=new char[length];
-        memcpy(recC,data+offset,length);
-        string rec(recC);
-        delete[] recC;
+        string rec(data+offset);
         string val=value.strData;
         switch (op){
             case EQ:
