@@ -10,6 +10,8 @@
 #include <map>
 #include "IX.h"
 #include "RM.h"
+#include <iostream>
+
 using namespace std;
 
 const RC SM_NOTFOUND = SM_RC -1;

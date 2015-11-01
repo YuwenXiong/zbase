@@ -38,6 +38,10 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 	RelationCatRecord relRecord;
 	AttrCatRecord attrRecord;
 
+	cout << size << endl;
+	cout << attrs[0].attrName << endl;
+	cout << attrs.size() << endl;
+
 	for(int i = 0; i < attrs.size(); i++) {
 		attrRecord.relationName = relationName;
 		attrRecord.attrName = attrs[i].attrName;
@@ -53,6 +57,8 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 
 	if((rc = rmm.CreateFile(relationName, size)) != 0)
 		return rc;
+
+	cout << size << endl;
 
 	relRecord.relationName = relationName;
 	relRecord.tupleLength = size;
@@ -269,7 +275,7 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 		return SM_NOTFOUND;
 
 	rec.GetRid(rid);
-	if((rc = ixm.DestoryIndex(relationName, attrRecord->offset)))
+	if((rc = ixm.DestroyIndex(relationName, attrRecord->offset)))
 		return rc;
 
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
