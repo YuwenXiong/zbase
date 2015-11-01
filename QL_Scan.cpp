@@ -3,6 +3,7 @@
 //
 
 #include "QL_Scan.h"
+#include "QL.h"
 
 QL_IndexScanHandle::QL_IndexScanHandle(SM_Manager *smm, IX_Manager *ixm, RM_Manager *rmm, const string &_relationName,
                                        const string &_attrName, CmpOp _op, const Value &v) {
@@ -57,24 +58,24 @@ RC QL_IndexScanHandle::Close() {
 }
 
 
-RC QL_IndexScanHandle::GetNext(char *recordData) {
-    RC rc;
-    RID rid;
-    RM_Record record;
-    char* data;
-
-
-    if ((rc = ixIS.GetNextEntry(rid))) {
-        return (rc == IX_EOF) ? QL_EOF : rc;
-    }
-
-    if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(data))) {
-        return rc;
-    }
-
-    memcpy(recordData, data, tupleLength);
-    return RC_OK;
-}
+//RC QL_IndexScanHandle::GetNext(char *recordData) {
+//    RC rc;
+//    RID rid;
+//    RM_Record record;
+//    char* data;
+//
+//
+//    if ((rc = ixIS.GetNextEntry(rid))) {
+//        return (rc == IX_EOF) ? QL_EOF : rc;
+//    }
+//
+//    if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(data))) {
+//        return rc;
+//    }
+//
+//    memcpy(recordData, data, tupleLength);
+//    return RC_OK;
+//}
 
 RC QL_IndexScanHandle::GetNext(RID &rid) {
     RC rc;
@@ -87,13 +88,13 @@ RC QL_IndexScanHandle::GetNext(RID &rid) {
     return RC_OK;
 }
 
-void QL_IndexScanHandle::GetAttrCount(int &attrCount) {
-    attrCount = this->attrCount;
-}
-
-void QL_IndexScanHandle::GetAttrInfo(vector<AttrCatRecord> &attrs) {
-    attrs = this->attrs;
-}
+//void QL_IndexScanHandle::GetAttrCount(int &attrCount) {
+//    attrCount = this->attrCount;
+//}
+//
+//void QL_IndexScanHandle::GetAttrInfo(vector<AttrCatRecord> &attrs) {
+//    attrs = this->attrs;
+//}
 
 
 QL_FileScanHandle::QL_FileScanHandle(SM_Manager *smm, RM_Manager *rmm, const string &_relationName) {
@@ -127,15 +128,6 @@ QL_FileScanHandle::QL_FileScanHandle(SM_Manager *smm, RM_Manager *rmm, const str
     value = v;
 }
 
-QL_FileScanHandle::QL_FileScanHandle(SM_Manager *smm, RM_Manager *rmm, const string &_relationName, int _attrCount,
-                                     const vector<AttrCatRecord> &_attrs) {
-//    smManager = smm;
-//    rmManager = rmm;
-//    relationName = _relationName;
-//    attrCount = _attrCount;
-//    attrs = _attrs;
-//    tupleLength =
-}
 
 RC QL_FileScanHandle::Open() {
     RC rc;
@@ -166,16 +158,16 @@ RC QL_FileScanHandle::Close() {
     return RC_OK;
 }
 
-RC QL_FileScanHandle::GetNext(char *recordData) {
-    RC rc;
-    RM_Record record;
-    char* data;
-    if ((rc = rmFS.GetNextRecord(record)) || (rc = record.GetData(data))) {
-        return (rc == RM_EOF) ? QL_EOF : rc;
-    }
-    memcpy(recordData, data, tupleLength);
-    return RC_OK;
-}
+//RC QL_FileScanHandle::GetNext(char *recordData) {
+//    RC rc;
+//    RM_Record record;
+//    char* data;
+//    if ((rc = rmFS.GetNextRecord(record)) || (rc = record.GetData(data))) {
+//        return (rc == RM_EOF) ? QL_EOF : rc;
+//    }
+//    memcpy(recordData, data, tupleLength);
+//    return RC_OK;
+//}
 
 RC QL_FileScanHandle::GetNext(RID &rid) {
     RC rc;
@@ -186,10 +178,85 @@ RC QL_FileScanHandle::GetNext(RID &rid) {
     return RC_OK;
 }
 
-void QL_FileScanHandle::GetAttrCount(int &attrCount) {
-    attrCount = this->attrCount;
+//void QL_FileScanHandle::GetAttrCount(int &attrCount) {
+//    attrCount = this->attrCount;
+//}
+//
+//void QL_FileScanHandle::GetAttrInfo(vector<AttrCatRecord> &attrs) {
+//    attrs = this->attrs;
+//}
+
+QL_ProjectHandle::QL_ProjectHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, vector<RelationAttr> _selectAttrs): selectAttrs(_selectAttrs)  {
+    smManager = smm;
+    child = _child;
+    vector<AttrCatRecord> attrs;
+    smManager->GetAttrInfo(selectAttrs[0].relationName, (int)selectAttrs.size(), attrs);
 }
 
-void QL_FileScanHandle::GetAttrInfo(vector<AttrCatRecord> &attrs) {
-    attrs = this->attrs;
+QL_ProjectHandle::~QL_ProjectHandle() { }
+
+RC QL_ProjectHandle::Open() {
+    RC rc;
+    if ((rc = child->Open())) {
+        return rc;
+    }
+    return RC_OK;
+}
+
+RC QL_ProjectHandle::Close() {
+    RC rc;
+    if ((rc = child->Close())) {
+        return rc;
+    }
+    return RC_OK;
+}
+
+RC QL_ProjectHandle::GetNext(char *recordData) {
+    RC rc;
+//    char* data = new char[child->GetTupleLength()];
+    if ((rc = child->GetNext(recordData))) {
+        return rc;
+    }
+//    int childAttrCount = child->GetAttrCount();
+//    vector<AttrCatRecord> childAttrInfo = child->GetAttrInfo();
+//    int tupleLength = 0;
+//    for (int i = 0; i < )
+
+    return RC_OK;
+}
+
+
+QL_FilterHandle::QL_FilterHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, Condition _filter): filter(_filter) {
+    smManager = smm;
+    child = _child;
+}
+
+QL_FilterHandle::~QL_FilterHandle() { }
+
+RC QL_FilterHandle::Open() {
+    RC rc;
+    if ((rc = child->Open())) {
+        return rc;
+    }
+    return RC_OK;
+}
+
+RC QL_FilterHandle::Close() {
+    RC rc;
+    if ((rc = child->Close())) {
+        return rc;
+    }
+    return RC_OK;
+}
+
+RC QL_FilterHandle::GetNext(char *recordData) {
+    RC rc;
+    char* data = new char [child->GetTupleLength()];
+    while ((rc = child->GetNext(data)) != QL_EOF) {
+        AttrCatRecord lacRecord;
+        if ((rc = smManager->GetAttrInfo(filter.lAttr.relationName, filter.lAttr.attrName, lacRecord))) {
+            return rc;
+        }
+
+    }
 }

@@ -48,7 +48,7 @@ struct AttrInfo {
     AttrType attrType;
     size_t attrLength;
     Property property;
-    AttrInfo(string n, AttrType t, int l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
+    AttrInfo(string n, AttrType t, size_t l, Property p = NONE): attrName(n), attrType(t), attrLength(l), property(p) { }
     AttrInfo(){};
 };
 
@@ -94,10 +94,11 @@ struct RelationAttr {
 };
 
 struct Condition {
-    string lAttr; // left-hand side attr
+    RelationAttr lAttr; // left-hand side attr
     CmpOp op;
     Value rValue;
-    Condition(string l, CmpOp m, Value r): lAttr(l), op(m), rValue(r) { }
+    Condition(){}
+    Condition(RelationAttr l, CmpOp m, Value r): lAttr(l), op(m), rValue(r) { }
 };
 
 
