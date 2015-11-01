@@ -17,6 +17,7 @@ public:
     virtual RC GetNext(RID &rid) {
         return QL_EOF;
     }
+    virtual RC GetNext(char* data) = 0;
     size_t GetTupleLength() {
         return tupleLength;
     };
@@ -34,6 +35,7 @@ public:
     RC Open();
     RC Close();
     RC GetNext(RID &rid);
+    RC GetNext(char* data);
 //    size_t GetTupleLength();
 //    void GetAttrCount(int &attrCount);
 //    void GetAttrInfo(vector<AttrCatRecord> &attrs);
@@ -62,6 +64,7 @@ public:
     RC Open();
     RC Close();
     RC GetNext(RID &rid);
+    RC GetNext(char* data);
 //    size_t GetTupleLength();
 //    void GetAttrCount(int &attrCount);
 //    void GetAttrInfo(vector<AttrCatRecord> &attrs);
@@ -75,15 +78,14 @@ private:
     bool haveValue;
     CmpOp op;
     Value value;
-//    size_t tupleLength;
     int attrCount;
     vector<AttrCatRecord> attrs;
 
 };
 
-class QL_ProjectHandle {
+class QL_RootHandle: public QL_ScanHandle {
 public:
-    QL_ProjectHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, vector<RelationAttr> selectAttrs);
+    QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, const string &relationName);
     ~QL_ProjectHandle();
 
     RC Open();
@@ -93,12 +95,10 @@ public:
 private:
     SM_Manager* smManager;
     shared_ptr<QL_ScanHandle> child;
-    vector<RelationAttr> selectAttrs;
-    vector<AttrCatRecord> attrs;
 };
 #endif //ZBASE_QL_SCAN_H
 
-class QL_FilterHandle {
+class QL_FilterHandle: public QL_ScanHandle{
 public:
     QL_FilterHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, Condition filter);
     ~QL_FilterHandle();

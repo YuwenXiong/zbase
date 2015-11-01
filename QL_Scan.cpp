@@ -58,24 +58,23 @@ RC QL_IndexScanHandle::Close() {
 }
 
 
-//RC QL_IndexScanHandle::GetNext(char *recordData) {
-//    RC rc;
-//    RID rid;
-//    RM_Record record;
-//    char* data;
-//
-//
-//    if ((rc = ixIS.GetNextEntry(rid))) {
-//        return (rc == IX_EOF) ? QL_EOF : rc;
-//    }
-//
-//    if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(data))) {
-//        return rc;
-//    }
-//
-//    memcpy(recordData, data, tupleLength);
-//    return RC_OK;
-//}
+RC QL_IndexScanHandle::GetNext(char *recordData) {
+    RC rc;
+    RID rid;
+    RM_Record record;
+    char* data;
+
+    if ((rc = ixIS.GetNextEntry(rid))) {
+        return (rc == IX_EOF) ? QL_EOF : rc;
+    }
+
+    if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(data))) {
+        return rc;
+    }
+
+    memcpy(recordData, data, tupleLength);
+    return RC_OK;
+}
 
 RC QL_IndexScanHandle::GetNext(RID &rid) {
     RC rc;
@@ -158,16 +157,16 @@ RC QL_FileScanHandle::Close() {
     return RC_OK;
 }
 
-//RC QL_FileScanHandle::GetNext(char *recordData) {
-//    RC rc;
-//    RM_Record record;
-//    char* data;
-//    if ((rc = rmFS.GetNextRecord(record)) || (rc = record.GetData(data))) {
-//        return (rc == RM_EOF) ? QL_EOF : rc;
-//    }
-//    memcpy(recordData, data, tupleLength);
-//    return RC_OK;
-//}
+RC QL_FileScanHandle::GetNext(char *recordData) {
+    RC rc;
+    RM_Record record;
+    char* data;
+    if ((rc = rmFS.GetNextRecord(record)) || (rc = record.GetData(data))) {
+        return (rc == RM_EOF) ? QL_EOF : rc;
+    }
+    memcpy(recordData, data, tupleLength);
+    return RC_OK;
+}
 
 RC QL_FileScanHandle::GetNext(RID &rid) {
     RC rc;
@@ -186,16 +185,17 @@ RC QL_FileScanHandle::GetNext(RID &rid) {
 //    attrs = this->attrs;
 //}
 
-QL_ProjectHandle::QL_ProjectHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, vector<RelationAttr> _selectAttrs): selectAttrs(_selectAttrs)  {
+QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, const string &relationName) {
     smManager = smm;
     child = _child;
-    vector<AttrCatRecord> attrs;
-    smManager->GetAttrInfo(selectAttrs[0].relationName, (int)selectAttrs.size(), attrs);
+    RelationCatRecord rcRecord;
+    smManager->GetRelationInfo(relationName, rcRecord);
+    tupleLength = rcRecord.tupleLength;
 }
 
-QL_ProjectHandle::~QL_ProjectHandle() { }
+QL_RootHandle::~QL_ProjectHandle() { }
 
-RC QL_ProjectHandle::Open() {
+RC QL_RootHandle::Open() {
     RC rc;
     if ((rc = child->Open())) {
         return rc;
@@ -203,7 +203,7 @@ RC QL_ProjectHandle::Open() {
     return RC_OK;
 }
 
-RC QL_ProjectHandle::Close() {
+RC QL_RootHandle::Close() {
     RC rc;
     if ((rc = child->Close())) {
         return rc;
@@ -211,7 +211,7 @@ RC QL_ProjectHandle::Close() {
     return RC_OK;
 }
 
-RC QL_ProjectHandle::GetNext(char *recordData) {
+RC QL_RootHandle::GetNext(char *recordData) {
     RC rc;
 //    char* data = new char[child->GetTupleLength()];
     if ((rc = child->GetNext(recordData))) {
@@ -229,6 +229,9 @@ RC QL_ProjectHandle::GetNext(char *recordData) {
 QL_FilterHandle::QL_FilterHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, Condition _filter): filter(_filter) {
     smManager = smm;
     child = _child;
+    RelationCatRecord rcRecord;
+    smManager->GetRelationInfo(filter.lAttr.relationName, rcRecord);
+    tupleLength = rcRecord.tupleLength;
 }
 
 QL_FilterHandle::~QL_FilterHandle() { }
@@ -251,12 +254,40 @@ RC QL_FilterHandle::Close() {
 
 RC QL_FilterHandle::GetNext(char *recordData) {
     RC rc;
-    char* data = new char [child->GetTupleLength()];
-    while ((rc = child->GetNext(data)) != QL_EOF) {
+    char* data = new char [tupleLength];
+    bool match = false;
+    while (child->GetNext(data) != QL_EOF) {
         AttrCatRecord lacRecord;
         if ((rc = smManager->GetAttrInfo(filter.lAttr.relationName, filter.lAttr.attrName, lacRecord))) {
             return rc;
         }
-
+        switch (lacRecord.attrType) {
+            case INT: {
+                Value lValue(*((int *)(data + lacRecord.offset)));
+                match = matchRecord(lValue.iData, filter.rValue.iData, filter.op);
+                break;
+            }
+            case FLOAT: {
+                Value lValue(*((float *)(data + lacRecord.offset)));
+                match = matchRecord(lValue.fData, filter.rValue.fData, filter.op);
+                break;
+            }
+            case CHARN: {
+                Value lValue(string(data + lacRecord.offset));
+                match = matchRecord(lValue.strData, filter.rValue.strData, filter.op);
+                break;
+            }
+        }
+        if (match) {
+            break;
+        }
     }
+    if (!match) {
+        delete[] data;
+        return QL_EOF;
+    }
+    memcpy(recordData, data, tupleLength);
+    delete[] data;
+    return RC_OK;
 }
+

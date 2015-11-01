@@ -41,14 +41,17 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
 
     shared_ptr<QL_ScanHandle> scanHandle;
     bool useIndex = false;
-    for (int i = 0; i < conditions.size(); i++) {
-        if ((rc = smManager->GetAttrInfo(relations[0], conditions[i].lAttr, attr))) {
+    vector<Condition> changedCondition(conditions);
+    for (auto i = changedCondition.begin(); i != changedCondition.end(); ) {
+        if ((rc = smManager->GetAttrInfo(relations[0], i->lAttr, attr))) {
             return rc;
         }
         if (attr.indexNo != -1) {
-            scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relations[0], conditions[i].lAttr, conditions[i].op, conditions[i].rValue));
-            removeCondition(conditions, i);
+            scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relations[0], (i->lAttr).attrName, i->op, i->rValue));
+            i = changedCondition.erase(i);
             useIndex = true;
+        } else {
+            i++;
         }
     }
 
@@ -57,16 +60,16 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     }
 
     auto lastHandle = scanHandle;
-    if (conditions.size() > 0) {
-        shared_ptr<QL_ScanHandle> filterHandle[conditions.size()];
-        for (int i = 0; i < conditions.size(); i++) {
-            filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, conditions[i]));
+    if (changedCondition.size() > 0) {
+        shared_ptr<QL_ScanHandle> filterHandle[changedCondition.size()];
+        for (int i = 0; i < changedCondition.size(); i++) {
+            filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i]));
             lastHandle = filterHandle[i];
         }
     }
 
     shared_ptr<QL_ScanHandle> rootHandle;
-    rootHandle.reset(new QL_ProjectHandle(smManager, lastHandle, relations[0]));
+    rootHandle.reset(new QL_RootHandle(smManager, lastHandle, relations[0]));
 
 
     Printer printer(attrs);
@@ -79,7 +82,7 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     delete[] recordData;
 }
 
-RC QL_Manager::Insert(const string &relation, const vector<Value> values) {
+RC QL_Manager::Insert(const string &relation, vector<Value> values) {
     RC rc;
     RelationCatRecord rcRecord;
 
@@ -212,18 +215,16 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         return rc;
     }
     if (indexPos != -1) {
-        string attrName = conditions[indexPos].lAttr;
         CmpOp op = conditions[indexPos].op;
         AttrCatRecord attrData;
-        smManager->GetAttrInfo(relation, attrName, attrData);
-        scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, attrName, op, conditions[indexPos].rValue));
+        smManager->GetAttrInfo(relation, conditions[indexPos].lAttr.attrName, attrData);
+        scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, conditions[indexPos].lAttr.attrName, op, conditions[indexPos].rValue));
     } else {
         if (conditions.size() > 0) {
-            string attrName = conditions[0].lAttr;
             CmpOp op = conditions[0].op;
             AttrCatRecord attrData;
-            smManager->GetAttrInfo(relation, attrName, attrData);
-            scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation, attrName, op, conditions[0].rValue));
+            smManager->GetAttrInfo(relation, conditions[0].lAttr.attrName, attrData);
+            scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation, conditions[0].lAttr.attrName, op, conditions[0].rValue));
         } else {
             scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation));
         }
@@ -292,30 +293,29 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
 bool QL_Manager::MatchConditions(char *recordData, const vector<AttrCatRecord> &attrs,
                                  const vector<Condition> &conditions) {
     AttrCatRecord lacRecord;
-    string relation = attrs[0].relationName;
     for (int i = 0; i < conditions.size(); i++) {
-        string lAttr = conditions[i].lAttr;
-        smManager->GetAttrInfo(relation, lAttr, lacRecord);
+        smManager->GetAttrInfo(conditions[i].lAttr.relationName, conditions[i].lAttr.attrName, lacRecord);
         switch (lacRecord.attrType) {
             case INT: {
-                int lValue;
-                memcpy(&lValue, recordData + (lacRecord.offset), sizeof(lValue));
-                if (!matchRecord(lValue, conditions[i].rValue.iData, conditions[i].op)) {
+                Value lValue(*((int *)(recordData + lacRecord.offset)));
+                if (!matchRecord(lValue.iData, conditions[i].rValue.iData, conditions[i].op)) {
                     return false;
                 }
+                break;
             }
             case FLOAT: {
-                float lValue;
-                memcpy(&lValue, recordData + (lacRecord.offset), sizeof(lValue));
-                if (!matchRecord(lValue, conditions[i].rValue.fData, conditions[i].op)) {
+                Value lValue(*((float *)(recordData + lacRecord.offset)));
+                if (!matchRecord(lValue.fData, conditions[i].rValue.fData, conditions[i].op)) {
                     return false;
                 }
+                break;
             }
             case CHARN: {
                 string lValue(recordData + (lacRecord.offset));
                 if (!matchRecord(lValue, conditions[i].rValue.strData, conditions[i].op)) {
                     return false;
                 }
+                break;
             }
         }
     }
@@ -324,7 +324,7 @@ bool QL_Manager::MatchConditions(char *recordData, const vector<AttrCatRecord> &
 
 
 template<class T>
-bool QL_Manager::matchRecord(const T &lValue, const T &rValue, CmpOp op) {
+bool matchRecord(const T &lValue, const T &rValue, CmpOp op) {
     switch (op) {
         case EQ:
             return lValue == rValue;

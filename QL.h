@@ -6,10 +6,21 @@
 #define ZBASE_QL_H
 
 #include <vector>
+#include <iostream>
 #include "zbase.h"
 #include "RM.h"
 #include "IX.h"
 #include "SM.h"
+using namespace std;
+
+class Printer {
+public:
+    Printer(vector<AttrCatRecord> attrs);
+    void Print(const char* recordData);
+
+private:
+    vector<AttrCatRecord> attrs;
+};
 
 class QL_Manager {
 public:
@@ -21,14 +32,15 @@ public:
 private:
 
     bool MatchConditions(char* recordData, const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions);
-    template<class T>
-    bool matchRecord(const T &lValue, const T &rValue, CmpOp op);
     RC ValidateConditions(const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions);
 
     SM_Manager* smManager;
     IX_Manager* ixManager;
     RM_Manager* rmManager;
 };
+
+template<class T>
+bool matchRecord(const T &lValue, const T &rValue, CmpOp op);
 
 
 // warning

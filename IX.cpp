@@ -88,14 +88,14 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& data){
 
 RC IX_IndexScan::GetNextEntry(RID &rid){
     if (curNode==NULL)
-        return IX_NO_MORE_SCAN_RESULT;
+        return IX_EOF;
     else{
         if(curNode->entries[curPos]->Compare(op,cmpEntry)){
             rid=curNode->entries[curPos]->rid;
         }
         else if(op==LT||op==LE){
                     curNode=NULL;
-                    return IX_NO_MORE_SCAN_RESULT;
+                    return IX_EOF;
         }
         if((++curPos)==curNode->header.numEntries) {
             if (curNode->header.rightSibling == -1) {
