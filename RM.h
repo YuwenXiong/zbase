@@ -48,7 +48,7 @@ class RM_Record {
     friend class RM_FileHandle;
 public:
     RM_Record(){}
-    RM_Record(int recordSize,RID rid);
+    RM_Record(int recordSize,RID rid=RID());
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
