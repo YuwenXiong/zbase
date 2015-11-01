@@ -52,10 +52,10 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& data){
                 curNode=son;
             }
             break;
-        case GT:case GE:
+        case GT:case GE:case EQ:
             while(curNode->header.level!=0){
                 for(int i=0;i<curNode->header.numEntries;i++){
-                    if(i=curNode->header.numEntries-1){
+                    if(i==(curNode->header.numEntries-1)){
                         if(!curNode->entries[i]->Compare(GE,cmpEntry))
                             return IX_NO_SCAN_RESULT;
                         else{
@@ -166,7 +166,7 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
         indexHandle.b_tree.pffh.fileOpen = false;
         return rc;
     }
-    if(indexHandle.b_tree.header.root=NULL_PAGE){
+    if(indexHandle.b_tree.header.root==NULL_PAGE){
         if(rc=indexHandle.b_tree.Init())
             return rc;
     }
@@ -174,7 +174,7 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
         return rc;
     return 0;
 }
-RC IX_Manager::DestoryIndex(const string &fileName, int indexNo){
+RC IX_Manager::DestroyIndex(const string &fileName, int indexNo){
     RC rc;
     if(rc=pfm->DestroyFile(fileName.c_str()))
         return rc;
