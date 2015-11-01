@@ -89,13 +89,13 @@ private:
 class RM_FileScan {
 public:
     RM_FileScan();
-    RC OpenScan(RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op, Value value);
+    RC OpenScan(RM_FileHandle &fileHandle, AttrType attrType, size_t attrLength, int attrOffset, CmpOp op, Value value);
     RC GetNextRecord(RM_Record &record);
     RC CloseScan();
 private:
     RID currentRID;
     AttrType type;
-    int length;
+    size_t length;
     int offset;
     Value value;
     CmpOp op;

@@ -7,12 +7,19 @@
 #include "SM.h"
 #include "QL_Scan.h"
 
+QL_Manager::QL_Manager(SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm) {
+    smManager = &smm;
+    ixManager = &ixm;
+    rmManager = &rmm;
+}
+QL_Manager::~QL_Manager() { }
+
 // actually we would query all attrs and only one relation
-RC QL_Manager::Select(const vector <RelationAttr> &selectAttrs, const vector <string> &relations,
+RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> &relations,
                       const vector <Condition> &conditions) {
     RC rc;
     RelationCatRecord rcRecord;
-    AttrInfo attr;
+    AttrCatRecord attr;
     int attrCount;
     if ((rc = smManager->GetRelationInfo(relations[0], rcRecord))) {
         return rc;
@@ -24,10 +31,52 @@ RC QL_Manager::Select(const vector <RelationAttr> &selectAttrs, const vector <st
     }
 
     if ((rc = ValidateConditions(attrs, conditions))) {
-        return QL_INVALID_WHERE_CLAUSE;
+        return rc;
     }
 
+    selectAttrs.clear();
+    for (int i = 0; i < rcRecord.attrCount; i++) {
+        selectAttrs.push_back(attrs[i]);
+    }
 
+    shared_ptr<QL_ScanHandle> scanHandle;
+    bool useIndex = false;
+    for (int i = 0; i < conditions.size(); i++) {
+        if ((rc = smManager->GetAttrInfo(relations[0], conditions[i].lAttr, attr))) {
+            return rc;
+        }
+        if (attr.indexNo != -1) {
+            scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relations[0], conditions[i].lAttr, conditions[i].op, conditions[i].rValue));
+            removeCondition(conditions, i);
+            useIndex = true;
+        }
+    }
+
+    if (!useIndex) {
+        scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relations[0]));
+    }
+
+    auto lastHandle = scanHandle;
+    if (conditions.size() > 0) {
+        shared_ptr<QL_ScanHandle> filterHandle[conditions.size()];
+        for (int i = 0; i < conditions.size(); i++) {
+            filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, conditions[i]));
+            lastHandle = filterHandle[i];
+        }
+    }
+
+    shared_ptr<QL_ScanHandle> rootHandle;
+    rootHandle.reset(new QL_ProjectHandle(smManager, lastHandle, relations[0]));
+
+
+    Printer printer(attrs);
+    char* recordData = new char[rcRecord.tupleLength];
+    rootHandle->Open();
+    while (rootHandle->GetNext(recordData) != QL_EOF) {
+        printer.Print(recordData);
+    }
+    rootHandle->Close();
+    delete[] recordData;
 }
 
 RC QL_Manager::Insert(const string &relation, const vector<Value> values) {
@@ -153,7 +202,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         }
     }
 
-    shared_ptr<QL_ScanHandle> scanOp;
+    shared_ptr<QL_ScanHandle> scanHandle;
 
     RM_FileHandle rmFH;
     RID rid;
@@ -167,20 +216,20 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         CmpOp op = conditions[indexPos].op;
         AttrCatRecord attrData;
         smManager->GetAttrInfo(relation, attrName, attrData);
-        scanOp.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, attrName, op, conditions[indexPos].rValue));
+        scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, attrName, op, conditions[indexPos].rValue));
     } else {
         if (conditions.size() > 0) {
             string attrName = conditions[0].lAttr;
             CmpOp op = conditions[0].op;
             AttrCatRecord attrData;
             smManager->GetAttrInfo(relation, attrName, attrData);
-            scanOp.reset(new QL_FileScanHandle(smManager, rmManager, relation, attrName, op, conditions[0].rValue));
+            scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation, attrName, op, conditions[0].rValue));
         } else {
-            scanOp.reset(new QL_FileScanHandle(smManager, rmManager, relation));
+            scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation));
         }
     }
 
-    if ((rc = scanOp->Open())) {
+    if ((rc = scanHandle->Open())) {
         return rc;
     }
 
@@ -193,7 +242,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         }
     }
 
-    while (scanOp->GetNext(rid) != EOF) {
+    while (scanHandle->GetNext(rid) != EOF) {
         if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(recordData))) {
             return rc;
         }
@@ -234,7 +283,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
     }
     delete[] ixIH;
 
-    if ((rc = scanOp->Close()) || (rc = rmManager->CloseFile(rmFH))) {
+    if ((rc = scanHandle->Close()) || (rc = rmManager->CloseFile(rmFH))) {
         return rc;
     }
     return RC_OK;

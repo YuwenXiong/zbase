@@ -223,7 +223,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
         return PF_FILE_CLOSED;
     }
     if (headerChanged) {
-        if (fseek(pffh.fp, 0,RM_RECORD_HEADER_OFFSET) < 0) {
+        if (fseek(pffh.fp,RM_RECORD_HEADER_OFFSET, SEEK_SET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&header, sizeof(RM_RecordFileHeader), 1, pffh.fp) != 1) {
@@ -237,8 +237,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
     return RC_OK;
 }
 
-
-RC RM_FileScan::OpenScan(RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
+RC RM_FileScan::OpenScan(RM_FileHandle &fileHandle, AttrType attrType, size_t attrLength, int attrOffset, CmpOp op,
                          Value value) {
     if(open)return RM_FILESCAN_ALREADY_OPEN;
     if(fileHandle.header.lastFreeSlot==RID(0,0))return RM_SCAN_EMPTY_RECORD;
@@ -359,5 +358,6 @@ RC RM_FileScan::UpdateRID() {
 RM_FileScan::RM_FileScan(){
     open=false;
 }
+
 
 
