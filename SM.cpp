@@ -83,14 +83,13 @@ RC SM_Manager::DropTable(const string &relationName) {
 	RID rid;
 	bool isFound = false;
 	RM_Record rec;
-	RelationCatRecord *relRecord;
-	AttrCatRecord *attrRecord;
+	char* data;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -99,8 +98,8 @@ RC SM_Manager::DropTable(const string &relationName) {
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) relRecord);
-		if(relRecord->relationName == relationName) {
+		rec.GetData(data);
+		if(relationName == ((RelationCatRecordC *)data)->relationName) {
 			isFound = true;
 			break;
 		}
@@ -118,7 +117,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	if((rc = relfh.DeleteRecord(rid)) != 0)
 		return rc;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -127,10 +126,10 @@ RC SM_Manager::DropTable(const string &relationName) {
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) attrRecord);
-		if(attrRecord->relationName == relationName) {
-			if(attrRecord->indexNo != -1)
-				DropIndex(relationName, attrRecord->attrName);
+		rec.GetData(data);
+		if(relationName == ((AttrCatRecordC *)data)->relationName) {
+			if(((AttrCatRecordC *)data)->indexNo != -1)
+				DropIndex(relationName, ((AttrCatRecordC *)data)->attrName);
 			rec.GetRid(rid);
 			if((rc = attrfh.DeleteRecord(rid)) != 0)
 				return rc;

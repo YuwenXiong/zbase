@@ -13,27 +13,49 @@ int main() {
     IX_Manager ixm(pfm);
     RM_Manager rmm(pfm);
     SM_Manager smm(ixm, rmm);
-    vector<AttrInfo> attrs;
-    vector<AttrCatRecord> attrs2;
+    vector<AttrInfo> attrs1, attrs2;
+    vector<AttrCatRecord> attrRecords1, attrRecords2;
     AttrCatRecord attrRecord;
 
     AttrInfo s1("studentID", INT, 4);
     AttrInfo s2("name", CHARN, 10);
-    attrs.push_back(s1);
-    attrs.push_back(s2);
+    attrs1.push_back(s1);
+    attrs1.push_back(s2);
 
-//    if((rc = smm.CreateDb("myDB")) != 0)
-//        return rc;
+    AttrInfo s3("techerID", FLOAT, 4);
+    AttrInfo s4("name", CHARN, 8);
+    AttrInfo s5("salary", INT, 4);
+    attrs2.push_back(s3);
+    attrs2.push_back(s4);
+    attrs2.push_back(s5);
+
+    if((rc = smm.CreateDb("myDB")) != 0)
+        return rc;
     if((rc = smm.OpenDb("myDB")) != 0)
         return rc;
-//    if((rc = smm.CreateTable("test", attrs)) != 0)
-//        return rc;
-    if((rc = smm.GetAttrInfo("test", "studentID", attrRecord)) != 0)
+
+    if((rc = smm.CreateTable("Student", attrs1)) != 0)
         return rc;
-    if((rc = smm.GetAttrInfo("test", 2, attrs2)))
+    if((rc = smm.CreateTable("Teacher", attrs2)) != 0)
         return rc;
 
-    print(attrs2);
+    if((rc = smm.DropTable("Student")))
+        return rc;
+
+    rc = smm.GetAttrInfo("Student", 2, attrRecords1);
+    if((rc == SM_NOTFOUND))
+        cout << "Not Found!" << endl;
+    else if((rc))
+        return rc;
+
+    rc = smm.GetAttrInfo("Teacher", 3, attrRecords2);
+    if((rc == SM_NOTFOUND))
+        cout << "Not Found!" << endl;
+    else if((rc))
+        return rc;
+
+    print(attrRecords1);
+    print(attrRecords2);
 
     if ((rc = smm.CloseDb())) {
         return rc;
