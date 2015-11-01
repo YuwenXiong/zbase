@@ -137,6 +137,7 @@ RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
 RC RM_FileHandle::DeleteRecord(const RID &rid) {
     PageNum pageNum;
     SlotNum slotNum;
+    headerChanged=true;
     RC rc;
     if ((rc=rid.GetPageNum(pageNum)))
         return rc;
@@ -186,6 +187,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     PageNum pageNumF,pageNumL;
     RC rc;
     SlotNum slotNumF,slotNumL;
+    headerChanged=true;
     bool insertAtTail=false;
     if(header.firstFreeSlot.GetPageNum(pageNumF)==RM_NULL_PAGE){
         if((rc=pffh.AllocatePage(pfph)))
