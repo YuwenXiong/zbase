@@ -34,16 +34,16 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
         return rc;
     }
 
-    selectAttrs.clear();
-    for (int i = 0; i < rcRecord.attrCount; i++) {
-        selectAttrs.push_back(attrs[i]);
-    }
+//    selectAttrs.clear();
+//    for (int i = 0; i < rcRecord.attrCount; i++) {
+//        selectAttrs.push_back(attrs[i]);
+//    }
 
     shared_ptr<QL_ScanHandle> scanHandle;
     bool useIndex = false;
     vector<Condition> changedCondition(conditions);
     for (auto i = changedCondition.begin(); i != changedCondition.end(); ) {
-        if ((rc = smManager->GetAttrInfo(relations[0], i->lAttr, attr))) {
+        if ((rc = smManager->GetAttrInfo(relations[0], (i->lAttr).attrName, attr))) {
             return rc;
         }
         if (attr.indexNo != -1) {
@@ -61,7 +61,8 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
 
     auto lastHandle = scanHandle;
     if (changedCondition.size() > 0) {
-        shared_ptr<QL_ScanHandle> filterHandle[changedCondition.size()];
+
+        vector<shared_ptr<QL_ScanHandle>> filterHandle(changedCondition.size());
         for (int i = 0; i < changedCondition.size(); i++) {
             filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i]));
             lastHandle = filterHandle[i];
@@ -80,6 +81,7 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     }
     rootHandle->Close();
     delete[] recordData;
+    return RC_OK;
 }
 
 RC QL_Manager::Insert(const string &relation, vector<Value> values) {
@@ -130,18 +132,21 @@ RC QL_Manager::Insert(const string &relation, vector<Value> values) {
 
     for (int i = 0; i < rcRecord.attrCount; i++) {
         switch (attrs[i].attrType) {
-            case INT:
+            case INT: {
                 memcpy(tupleData + attrs[i].offset, &values[i].iData, attrs[i].attrLength);
                 break;
-            case FLOAT:
+            }
+            case FLOAT: {
                 memcpy(tupleData + attrs[i].offset, &values[i].fData, attrs[i].attrLength);
                 break;
-            case CHARN:
+            }
+            case CHARN: {
                 char *value = new char[attrs[i].attrLength];
-                memset(value, 0, sizeof value);
+                memset(value, 0, attrs[i].attrLength);
                 strcpy(value, values[i].strData.c_str());
                 memcpy(tupleData + attrs[i].offset, value, attrs[i].attrLength);
                 break;
+            }
             default:
                 assert(0);
         }
@@ -196,7 +201,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
     int indexPos = -1;
     for (int i = 0; i < conditions.size() && indexPos == -1; i++) {
         for (int j = 0; j < rcRecord.attrCount; j++) {
-            if (attrs[j].attrName == conditions[i].lAttr) {
+            if (attrs[j].attrName == conditions[i].lAttr.attrName) {
                 if (attrs[j].indexNo != -1) {
                     indexPos = i;
                     break;
@@ -348,7 +353,7 @@ RC QL_Manager::ValidateConditions(const vector<AttrCatRecord> &attrs, const vect
     for (int i = 0; i < conditions.size(); i++) {
         bool found = false;
         for (int j = 0; j < attrs.size(); j++) {
-            if (attrs[j].attrName == conditions[i].lAttr && attrs[j].attrType == conditions[i].rValue.type) {
+            if (attrs[j].attrName == conditions[i].lAttr.attrName && attrs[j].attrType == conditions[i].rValue.type) {
                 found = true;
                 break;
             }

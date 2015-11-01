@@ -86,7 +86,7 @@ private:
 class QL_RootHandle: public QL_ScanHandle {
 public:
     QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, const string &relationName);
-    ~QL_ProjectHandle();
+    ~QL_RootHandle();
 
     RC Open();
     RC Close();

@@ -193,7 +193,7 @@ QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, 
     tupleLength = rcRecord.tupleLength;
 }
 
-QL_RootHandle::~QL_ProjectHandle() { }
+QL_RootHandle::~QL_RootHandle() { }
 
 RC QL_RootHandle::Open() {
     RC rc;
