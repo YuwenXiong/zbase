@@ -9,7 +9,7 @@
 #include "PF.h"
 #include "zbase.h"
 
-#define RM_EOF -1
+
 
 using namespace std;
 
@@ -48,7 +48,7 @@ class RM_Record {
     friend class RM_FileHandle;
 public:
     RM_Record(){}
-    RM_Record(int recordSize,RID rid);
+    RM_Record(int recordSize,RID rid=RID());
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
@@ -113,4 +113,5 @@ const RC RM_ALREADY_DELETED=RM_RC+4;
 const RC RM_NO_VALID_DATA=RM_RC+5;
 const RC RM_FILESCAN_ALREADY_OPEN=RM_RC+6;
 const RC RM_SCAN_EMPTY_RECORD=RM_RC+7;
+const RC RM_EOF=RM_RC+8;
 #endif //ZBASE_RM_H

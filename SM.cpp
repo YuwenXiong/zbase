@@ -339,8 +339,9 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData) {
 	RM_FileScan rmfs;
 	RC rc;
-	RM_Record rec;
+	RM_Record rec(sizeof(AttrInfo));
 	bool isFound = false;
+	char* data;
 	AttrCatRecord *attrRecord;
 	Value value;
 
@@ -356,8 +357,9 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) attrRecord);
-		if(attrRecord->attrName == attrName) {
+		rec.GetData(data);
+
+		if(((AttrCatRecord *)data)->attrName == attrName) {
 			isFound = true;
 			break;
 		}
