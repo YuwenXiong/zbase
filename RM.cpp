@@ -1,6 +1,6 @@
+#include <assert.h>
 #include "zbase.h"
 #include "RM.h"
-#include "io.h"
 #include "SM.h"
 
 RID::RID(PageNum pageNum, SlotNum slotNum):pageNum(pageNum),slotNum(slotNum){ }
@@ -207,7 +207,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     else
         header.firstFreeSlot=RID(pageNumF,slotNumF+1);
     RM_SlotHeader slotHeader;
-    slotHeader.empty==false;
+    slotHeader.empty=false;
     slotHeader.nextFreeSlot=RID();
     memcpy(pfph.pageData+slotNumF*header.slotSize,&slotHeader,sizeof(RM_SlotHeader));
     memcpy(pfph.pageData+slotNumF*header.slotSize+sizeof(RM_SlotHeader),data,header.recordSize);
@@ -234,6 +234,7 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
     RC rc;
     if((rc=pffh.ForcePages(pageNum)))
         return rc;
+    return RC_OK;
 }
 
 
@@ -332,7 +333,8 @@ bool RM_FileScan::IsValid(RM_Record &record){
                 return true;
         }
     }
-
+    assert(0);
+    return RC_OK;
 }
 
 RC RM_FileScan::UpdateRID() {

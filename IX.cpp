@@ -177,7 +177,8 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
 RC IX_Manager::DestoryIndex(const string &fileName, int indexNo){
     RC rc;
     if(rc=pfm->DestroyFile(fileName.c_str()))
-    return rc;
+        return rc;
+    return RC_OK;
 }
 
 RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
