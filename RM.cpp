@@ -66,13 +66,13 @@ RC RM_Manager::CreateFile(const string &fileName, int recordSize){
     recordFileHeader.slotPerPage=PF_PAGE_SIZE/recordFileHeader.slotSize;
 
     size_t numBytes = fwrite(&fileHeader, sizeof(fileHeader), 1, fid);
-    if (numBytes != sizeof(fileHeader)) {
+    if (numBytes != 1) {
         fclose(fid);
         unlink(fileName.c_str());
         return PF_SYSTEM_ERROR;
     }
     numBytes = fwrite(& recordFileHeader, sizeof( recordFileHeader), 1, fid);
-    if (numBytes != sizeof(recordFileHeader)) {
+    if (numBytes != 1) {
         fclose(fid);
         unlink(fileName.c_str());
         return PF_SYSTEM_ERROR;
@@ -91,7 +91,7 @@ RC RM_Manager::OpenFile(const string &fileName, RM_FileHandle &fileHandle) {
     if((rc=pfm->OpenFile(fileName.c_str(),fileHandle.pffh)))
         return rc;
     size_t numBytes = fread(&(fileHandle.header), sizeof(fileHandle.header), 1, fileHandle.pffh.fp);
-    if (numBytes != sizeof( RM_RecordFileHeader)) {
+    if (numBytes != 1) {
         rc = PF_SYSTEM_ERROR;
         fclose(fileHandle.pffh.fp);
         fileHandle.pffh.fileOpen = false;
