@@ -43,7 +43,7 @@ class IX_Manager {
 public:
     IX_Manager(PF_Manager &pfm);
     RC CreateIndex(const string &fileName, int indexNo, AttrType attrType, int attrLength);
-    RC DestoryIndex(const string &fileName, int indexNo);
+    RC DestroyIndex(const string &fileName, int indexNo);
     RC OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &indexHandle);
     RC CloseIndex(IX_IndexHandle &indexHandle);
 private:
