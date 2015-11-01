@@ -150,9 +150,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	IX_IndexHandle ixh;
 	RM_FileHandle rmfh;
 	RM_FileScan rmfs;
-	char *pdata;
-	AttrCatRecord *pdata1;
-	RelationCatRecord *pdata2;
+	char *pdata, *pdata1, *pdata2;
 	string s;
 	Value value, data;
 	map<string, string> m;
@@ -163,8 +161,8 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return SM_INDEXEXISTS;
 	if((rc = attrfh.GetRecord(rid, rec)) != 0)
 		return rc;
-	rec.GetData((char*&) pdata1);
-	pdata1->indexNo = attrRecord.offset;
+	rec.GetData(pdata1);
+	((AttrCatRecordC *)pdata1)->indexNo = attrRecord.offset;
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
 		return rc;
 
@@ -177,8 +175,8 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return rc;
 	if((rc = relfh.GetRecord(rid, rec)) != 0)
 		return rc;
-	rec.GetData((char*&) pdata2);
-	pdata2->indexCount++;
+	rec.GetData(pdata2);
+	((RelationCatRecordC *)pdata2)->indexCount++;
 	if((rc = relfh.UpdateRecord(rec)) != 0)
 		return rc;
 
@@ -188,7 +186,6 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return rc;
 	if((rc = rmm.OpenFile(relationName, rmfh)) != 0)
 		return rc;
-	value.type = attrRecord.attrType;
 	if((rc = rmfs.OpenScan(rmfh, attrRecord.attrType, attrRecord.attrLength, attrRecord.offset, NO, value)) != 0)
 		return rc;
 
@@ -207,7 +204,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		else if(data.type == FLOAT)
 			data.fData = *(float *)(pdata + attrRecord.offset);
 		else if(data.type == CHARN)
-			data.strData = pdata + attrRecord.offset;
+			data.strData = string(pdata + attrRecord.offset);
 		ixh.InsertEntry(data, rid);
 	}
 
@@ -248,8 +245,7 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 	bool isFound = false;
 	RM_Record rec;
 	RelationCatRecord relRecord;
-	RelationCatRecord *pdata;
-	AttrCatRecord *attrRecord;
+	char* pdata;
 	RID rid;
 	RC rc;
 	Value value;
@@ -267,9 +263,9 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) attrRecord);
-		if(attrRecord->attrName == attrName) {
-			attrRecord->indexNo = -1;
+		rec.GetData(pdata);
+		if(attrName == ((AttrCatRecordC *)pdata)->attrName) {
+			((AttrCatRecordC *)pdata)->indexNo = -1;
 			isFound = true;
 			break;
 		}
@@ -281,7 +277,7 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 		return SM_NOTFOUND;
 
 	rec.GetRid(rid);
-	if((rc = ixm.DestroyIndex(relationName, attrRecord->offset)))
+	if((rc = ixm.DestroyIndex(relationName, ((AttrCatRecordC *)pdata)->offset)))
 		return rc;
 
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
@@ -291,8 +287,8 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 		return rc;
 	if((rc = relfh.GetRecord(rid, rec)) != 0)
 		return rc;
-	rec.GetData((char*&) pdata);
-	pdata->indexCount--;
+	rec.GetData(pdata);
+	((RelationCatRecordC *)pdata)->indexCount--;
 	if((rc = relfh.UpdateRecord(rec)) != 0)
 		return rc;
 
