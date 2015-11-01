@@ -32,18 +32,20 @@ RC RM_Record::GetRid(RID &rid) const{
     rid=this->rid;
     return 0;
 }
-RC RM_Record::GetData(char *&data) const {
+RC RM_Record::GetData(char* &data) const {
     RC rc;
-    if(data==NULL)
-        return RM_NO_VALID_DATA;
-    else {
+    // wating for check
+//    if(data==NULL)
+//        return RM_NO_VALID_DATA;
+//    else {
         data=this->data;
         return 0;
-    }
+//    }
 
 }
 RM_Record::RM_Record(int recordSize,RID rid):rid(rid){
     data=new char[recordSize];
+    this->recordSize = recordSize;
 }
 RM_Record::~RM_Record(){
     if(data)
@@ -183,16 +185,16 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
         pageNumF=0;
         slotNumF=0;
         header.lastFreeSlot=RID(0,1);
+        insertAtTail = true;
     }
     else {
-        header.firstFreeSlot.GetPageNum(slotNumF);
+        header.firstFreeSlot.GetSlotNum(slotNumF);
         if (slotNumF==header.slotPerPage){
             if((rc=pffh.AllocatePage(pfph)))
                 return rc;
             pageNumF++;
             slotNumF=0;
             header.lastFreeSlot=RID(pageNumF,slotNumF+1);
-
         }
         else{
             if((rc=pffh.GetThisPage(pageNumF,pfph)))

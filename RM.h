@@ -49,12 +49,19 @@ class RM_Record {
 public:
     RM_Record(){data = NULL;}
     RM_Record(int recordSize,RID rid=RID());
+    RM_Record& operator=(const RM_Record &x) {
+        rid = x.rid;
+        recordSize = x.recordSize;
+        data = new char[recordSize];
+        memcpy(data, x.data, recordSize);
+    }
     ~RM_Record();
     RC GetData(char* &data) const;
     RC GetRid(RID &rid) const;
 private:
     char* data;
     RID rid;
+    size_t recordSize;
 };
 
 class RM_FileHandle {

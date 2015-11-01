@@ -10,7 +10,7 @@
 
 using std::string;
 
-#define MAXRELATIONNAME 255
+#define MAXNAME 255
 
 // return code for traceback
 typedef int RC;
@@ -52,11 +52,25 @@ struct AttrInfo {
     AttrInfo(){};
 };
 
+struct RelationCatRecordC;
+struct AttrCatRecordC;
+
+
 struct RelationCatRecord {
     string relationName;
     size_t tupleLength; // byte size of tuple, used by Record Manager
     int attrCount;
     int indexCount;
+    RelationCatRecord();
+    RelationCatRecord(const RelationCatRecordC &x);
+};
+
+struct RelationCatRecordC {
+    char relationName[MAXNAME];
+    size_t tupleLength; // byte size of tuple, used by Record Manager
+    int attrCount;
+    int indexCount;
+    RelationCatRecordC(const RelationCatRecord &x);
 };
 
 struct AttrCatRecord {
@@ -67,7 +81,23 @@ struct AttrCatRecord {
     size_t attrLength;
     int indexNo;
     Property property;
+    AttrCatRecord();
+    AttrCatRecord(const AttrCatRecordC &x);
 };
+
+struct AttrCatRecordC {
+    char relationName[MAXNAME];
+    char attrName[MAXNAME];
+    int offset;
+    AttrType attrType;
+    size_t attrLength;
+    int indexNo;
+    Property property;
+    AttrCatRecordC(const AttrCatRecord &x);
+};
+
+
+
 
 struct Value {
     AttrType type;

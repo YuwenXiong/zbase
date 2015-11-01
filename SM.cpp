@@ -9,12 +9,12 @@ SM_Manager::~SM_Manager() {
 
 }
 
-RC SM_Manager::createDb(const string &dbName) {
+RC SM_Manager::CreateDb(const string &dbName) {
 	RC rc;
 
-	if((rc = rmm.CreateFile("relcat", sizeof(RelationCatRecord))) != 0)
+	if((rc = rmm.CreateFile("relcat", sizeof(RelationCatRecordC))) != 0)
 		return rc;
-	if((rc = rmm.CreateFile("attrcat", sizeof(AttrCatRecord))) != 0)
+	if((rc = rmm.CreateFile("attrcat", sizeof(AttrCatRecordC))) != 0)
 		return rc;
 
 	return 0;
@@ -57,7 +57,8 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 		attrRecord.attrLength = attrs[i].attrLength;
 		attrRecord.property = attrs[i].property;
 		attrRecord.indexNo = -1;
-		if((rc = attrfh.InsertRecord((char*) &attrRecord, rid)) != 0)
+		AttrCatRecordC temp(attrRecord);
+		if((rc = attrfh.InsertRecord((char*)&temp, rid)) != 0)
 			return rc;
 		size += attrs[i].attrLength;
 	}
@@ -65,13 +66,12 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 	if((rc = rmm.CreateFile(relationName, size)) != 0)
 		return rc;
 
-	cout << size << endl;
-
 	relRecord.relationName = relationName;
 	relRecord.tupleLength = size;
 	relRecord.attrCount = attrs.size();
 	relRecord.indexCount = 0;
-	if((rc = relfh.InsertRecord((char *) &relRecord, rid)) != 0)
+	RelationCatRecordC temp(relRecord);
+	if((rc = relfh.InsertRecord((char *) &temp, rid)) != 0)
 		return rc;
 
 	return 0;
@@ -90,7 +90,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -118,7 +118,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	if((rc = relfh.DeleteRecord(rid)) != 0)
 		return rc;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -258,7 +258,7 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
 		return rc;
 
 	while(true) {
@@ -305,14 +305,14 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 	RC rc;
 	RM_Record rec;
 	bool isFound = false;
-	RelationCatRecord *relRecord;
-	AttrCatRecord *attrRecord;
+	AttrCatRecord attrData;
+	char* data;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -321,10 +321,12 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) attrRecord);
-		if(attrRecord->relationName == relationName) {
+		rec.GetData(data);
+		if(relationName == ((AttrCatRecordC *)data)->relationName) {
 			isFound = true;
-			attrs.push_back(*attrRecord);
+			AttrCatRecordC temp(attrData);
+			memcpy(&temp, data, sizeof(AttrCatRecordC));
+			attrs.push_back(AttrCatRecord(temp));
 		}
 	}
 	if((rc = rmfs.CloseScan()) != 0)
@@ -339,16 +341,15 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, AttrCatRecord &attrData) {
 	RM_FileScan rmfs;
 	RC rc;
-	RM_Record rec(sizeof(AttrInfo));
+	RM_Record rec;
 	bool isFound = false;
 	char* data;
-	AttrCatRecord *attrRecord;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = attrName;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, attrName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, attrName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -359,7 +360,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 
 		rec.GetData(data);
 
-		if(((AttrCatRecord *)data)->attrName == attrName) {
+		if(attrName == ((AttrCatRecordC *)data)->attrName) {
 			isFound = true;
 			break;
 		}
@@ -367,12 +368,12 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
-	cout << attrRecord->relationName << endl;
-
 	if(!isFound)
 		return SM_NOTFOUND;
-	memcpy(&attrData,attrRecord, sizeof(AttrCatRecord));
-//	attrData = *attrRecord;
+
+	AttrCatRecordC temp(attrData);
+	memcpy(&temp, data, sizeof(AttrCatRecordC));
+	attrData = AttrCatRecord(temp);
 
 	return 0;
 }
@@ -382,13 +383,13 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	RC rc;
 	RM_Record rec;
 	bool isFound = false;
-	AttrCatRecord *attrRecord;
+	char* data;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = attrName;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXRELATIONNAME, offsetof(AttrCatRecord, attrName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, attrName), EQ, value)) != 0)
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -397,8 +398,9 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) attrRecord);
-		if(attrRecord->attrName == attrName) {
+		rec.GetData(data);
+
+		if(attrName == ((AttrCatRecordC *)data)->attrName) {
 			rec.GetRid(rid);
 			isFound = true;
 			break;
@@ -410,7 +412,9 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	if(!isFound)
 		return SM_NOTFOUND;
 
-	attrData = *attrRecord;
+	AttrCatRecordC temp(attrData);
+	memcpy(&temp, data, sizeof(AttrCatRecordC));
+	attrData = AttrCatRecord(temp);
 
 	return 0;
 }
@@ -420,13 +424,13 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	RC rc;
 	RM_Record rec;
 	bool isFound = false;
-	RelationCatRecord *relRecord;
+	char* data;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -435,8 +439,8 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) relRecord);
-		if(relRecord->relationName == relationName) {
+		rec.GetData(data);
+		if(relationName == ((AttrCatRecordC *)data)->relationName) {
 			isFound = true;
 			break;
 		}
@@ -447,9 +451,9 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	if(!isFound)
 		return SM_NOTFOUND;
 
-	relationData = *relRecord;
-
-	cout << relationData.relationName << endl;
+	RelationCatRecordC temp(relationData);
+	memcpy(&temp, data, sizeof(RelationCatRecordC));
+	relationData = RelationCatRecord(temp);
 
 	return 0;
 }
@@ -459,13 +463,13 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	RC rc;
 	RM_Record rec;
 	bool isFound = false;
-	RelationCatRecord *relRecord;
+	char* data;
 	Value value;
 
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(relfh, CHARN, MAXRELATIONNAME, offsetof(RelationCatRecord, relationName), EQ, value)) != 0 )
+	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
 		return rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
@@ -474,8 +478,8 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 		if(rc != 0)
 			return rc;
 
-		rec.GetData((char*&) relRecord);
-		if(relRecord->relationName == relationName) {
+		rec.GetData(data);
+		if(relationName == ((AttrCatRecordC *)data)->relationName) {
 			rec.GetRid(rid);
 			isFound = true;
 			break;
@@ -487,7 +491,9 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	if(!isFound)
 		return SM_NOTFOUND;
 
-	relationData = *relRecord;
+	RelationCatRecordC temp(relationData);
+	memcpy(&temp, data, sizeof(RelationCatRecordC));
+	relationData = RelationCatRecord(temp);
 
 	return 0;
 }
