@@ -46,7 +46,8 @@ RM_Record::RM_Record(int recordSize,RID rid):rid(rid){
     char * data=new char[recordSize];
 }
 RM_Record::~RM_Record(){
-    delete []data;
+    if(data)
+        delete []data;
 }
 RC RM_Manager::CreateFile(const string &fileName, int recordSize){
     FILE *fid; // file identifier, we don't expose fd to avoid portability problem
@@ -124,7 +125,7 @@ RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
         return rc;
     if((*(RM_SlotHeader*)(pfph.pageData+slotNum*header.slotSize)).empty)
         return RM_READ_EMPTY_SLOT;
-    rec=RM_Record(header.recordSize,rid);
+ //   rec=RM_Record(header.recordSize,rid);
     memcpy(rec.data,pfph.pageData+slotNum*header.slotSize+sizeof(RM_SlotHeader),header.recordSize);
     return 0;
 }

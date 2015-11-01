@@ -49,10 +49,6 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 	RelationCatRecord relRecord;
 	AttrCatRecord attrRecord;
 
-	cout << size << endl;
-	cout << attrs[0].attrName << endl;
-	cout << attrs.size() << endl;
-
 	for(int i = 0; i < attrs.size(); i++) {
 		attrRecord.relationName = relationName;
 		attrRecord.attrName = attrs[i].attrName;
@@ -369,10 +365,12 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	if((rc = rmfs.CloseScan()) != 0)
 		return rc;
 
+	cout << attrRecord->relationName << endl;
+
 	if(!isFound)
 		return SM_NOTFOUND;
-
-	attrData = *attrRecord;
+	memcpy(&attrData,attrRecord, sizeof(AttrCatRecord));
+//	attrData = *attrRecord;
 
 	return 0;
 }
@@ -448,6 +446,8 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 		return SM_NOTFOUND;
 
 	relationData = *relRecord;
+
+	cout << relationData.relationName << endl;
 
 	return 0;
 }
