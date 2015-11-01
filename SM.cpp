@@ -98,7 +98,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	if(!isFound)
 		return SM_NOTFOUND;
 
-	if((rc = rmm.DestoryFile(relationName)) != 0)
+	if((rc = rmm.DestroyFile(relationName)) != 0)
 		return rc;
 
 	rec.GetRid(rid);
