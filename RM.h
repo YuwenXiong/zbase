@@ -9,7 +9,7 @@
 #include "PF.h"
 #include "zbase.h"
 
-#define RM_EOF -1
+
 
 using namespace std;
 
@@ -113,4 +113,5 @@ const RC RM_ALREADY_DELETED=RM_RC+4;
 const RC RM_NO_VALID_DATA=RM_RC+5;
 const RC RM_FILESCAN_ALREADY_OPEN=RM_RC+6;
 const RC RM_SCAN_EMPTY_RECORD=RM_RC+7;
+const RC RM_EOF=RM_RC+8;
 #endif //ZBASE_RM_H
