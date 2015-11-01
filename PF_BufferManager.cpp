@@ -154,9 +154,9 @@ RC PF_BufferManager::FlushPages(FILE *fd) {
         next = slot;
         next++;
         if (bufTable[*slot].fd == fd) {
-            if (bufTable[*slot].pinCount) {
-                rcWarn = PF_PAGE_PINNED;
-            } else {
+//            if (bufTable[*slot].pinCount) {
+//                rcWarn = PF_PAGE_PINNED;
+//            } else {
                 if (bufTable[*slot].dirty) {
                     if ((rc = WritePage(fd, bufTable[*slot].pageNum, bufTable[*slot].data))) {
                         return rc;
@@ -166,7 +166,7 @@ RC PF_BufferManager::FlushPages(FILE *fd) {
                 if ((rc = hashTable.Delete(fd, bufTable[*slot].pageNum)) || (rc = Unlink(*slot)) || (rc = InsertFree(*slot))) {
                     return rc;
                 }
-            }
+//            }
         }
     }
     return rcWarn;

@@ -27,7 +27,7 @@ private:
 public:
     SM_Manager(IX_Manager &ixm, RM_Manager &rmm);
     ~SM_Manager();
-    RC createDb(const string &dbName);
+    RC CreateDb(const string &dbName);
     RC OpenDb(const string &dbName);
     RC CloseDb();
     RC CreateTable(const string &relationName, const vector<AttrInfo> &attrs);

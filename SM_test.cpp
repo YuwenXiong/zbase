@@ -16,7 +16,7 @@ int main() {
     attrs.push_back(s1);
     attrs.push_back(s2);
 
-    if((rc = smm.createDb("myDB")) != 0)
+    if((rc = smm.CreateDb("myDB")) != 0)
         return rc;
     if((rc = smm.OpenDb("myDB")) != 0)
         return rc;
@@ -26,7 +26,10 @@ int main() {
         return rc;
 
     cout << attrRecord.attrName << endl;
+    cout << attrRecord.relationName << endl;
 
-    cout << "hello" << endl;
+    if ((rc = smm.CloseDb())) {
+        return rc;
+    }
     return 0;
 }
