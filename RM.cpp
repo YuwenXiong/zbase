@@ -1,6 +1,6 @@
+#include <assert.h>
 #include "zbase.h"
 #include "RM.h"
-#include "io.h"
 #include "SM.h"
 
 RID::RID(PageNum pageNum, SlotNum slotNum):pageNum(pageNum),slotNum(slotNum){ }
@@ -101,8 +101,8 @@ RC RM_Manager::OpenFile(const string &fileName, RM_FileHandle &fileHandle) {
     return RC_OK;
 
 }
-RC RM_Manager::DestoryFile(const string &fileName) {
-    return pfm->DestoryFile(fileName.c_str());
+RC RM_Manager::DestroyFile(const string &fileName) {
+    return pfm->DestroyFile(fileName.c_str());
 
 }
 RC RM_Manager::CloseFile(RM_FileHandle &fileHandle) {
@@ -111,7 +111,7 @@ RC RM_Manager::CloseFile(RM_FileHandle &fileHandle) {
     return pfm->CloseFile(fileHandle.pffh);
 }
 
-RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) const {
+RC RM_FileHandle::GetRecord(const RID &rid, RM_Record &rec) {
     PageNum pageNum;
     SlotNum slotNum;
     RC rc;
@@ -207,7 +207,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     else
         header.firstFreeSlot=RID(pageNumF,slotNumF+1);
     RM_SlotHeader slotHeader;
-    slotHeader.empty==false;
+    slotHeader.empty=false;
     slotHeader.nextFreeSlot=RID();
     memcpy(pfph.pageData+slotNumF*header.slotSize,&slotHeader,sizeof(RM_SlotHeader));
     memcpy(pfph.pageData+slotNumF*header.slotSize+sizeof(RM_SlotHeader),data,header.recordSize);
@@ -234,9 +234,10 @@ RC RM_FileHandle::ForcePages(PageNum pageNum)  {
     RC rc;
     if((rc=pffh.ForcePages(pageNum)))
         return rc;
+    return RC_OK;
 }
 
-RC RM_FileScan::OpenScan(const RM_FileHandle &fileHandle, AttrType attrType, int attrLength, int attrOffset, CmpOp op,
+RC RM_FileScan::OpenScan(RM_FileHandle &fileHandle, AttrType attrType, size_t attrLength, int attrOffset, CmpOp op,
                          Value value) {
     if(open)return RM_FILESCAN_ALREADY_OPEN;
     if(fileHandle.header.lastFreeSlot==RID(0,0))return RM_SCAN_EMPTY_RECORD;
@@ -331,7 +332,8 @@ bool RM_FileScan::IsValid(RM_Record &record){
                 return true;
         }
     }
-
+    assert(0);
+    return RC_OK;
 }
 
 RC RM_FileScan::UpdateRID() {
@@ -353,6 +355,9 @@ RC RM_FileScan::UpdateRID() {
 }
 
 
+RM_FileScan::RM_FileScan(){
+    open=false;
+}
 
 
 

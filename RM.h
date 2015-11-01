@@ -95,7 +95,7 @@ public:
 private:
     RID currentRID;
     AttrType type;
-    int length;
+    size_t length;
     int offset;
     Value value;
     CmpOp op;
