@@ -47,7 +47,7 @@ struct RM_SlotHeader{
 class RM_Record {
     friend class RM_FileHandle;
 public:
-    RM_Record(){}
+    RM_Record(){data = NULL;}
     RM_Record(int recordSize,RID rid=RID());
     ~RM_Record();
     RC GetData(char* &data) const;

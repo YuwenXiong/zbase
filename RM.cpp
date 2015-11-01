@@ -43,7 +43,7 @@ RC RM_Record::GetData(char *&data) const {
 
 }
 RM_Record::RM_Record(int recordSize,RID rid):rid(rid){
-    char * data=new char[recordSize];
+    data=new char[recordSize];
 }
 RM_Record::~RM_Record(){
     if(data)
