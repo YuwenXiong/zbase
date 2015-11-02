@@ -2,6 +2,7 @@
 // Created by Zax on 2015/10/28.
 //
 
+#include <iostream>
 #include "B_Tree.h"
 #include "RM.h"
 #include "IX.h"
@@ -53,6 +54,7 @@ B_Node::B_Node() {
     header.level=-1;
     b_tree=NULL;
     header.numEntries=-1;
+
 }
 
 RC B_Node::Init(int level, B_Tree *b_tree) {
@@ -114,6 +116,7 @@ int B_Tree::GetEntrySize(const int& level) {
 
 RC B_Entry::Init(B_Tree* b_tree1,const int &level){
     b_tree=b_tree1;
+    son_ptr=NULL;
     son=NULL_PAGE;
     this->level=level;
 }
@@ -126,7 +129,7 @@ RC B_Entry::ReadFromPage(char* data){
     if(level==0)
         memcpy(&rid,data+b_tree->header.keysize,sizeof(RID));
     else
-
+        memcpy(&son,data+b_tree->header.keysize,sizeof(PageNum));
     return 0;
 }
 
@@ -155,7 +158,7 @@ RC B_Entry::SetFromSon(B_Node* nodeSon){
 }
 RC B_Tree::Insert(B_Entry* newEntry){
     LoadRoot();
-    B_Node* newNode;
+    B_Node* newNode=NULL;
     BINSRT insertRet=root_ptr->Insert(newEntry,newNode);
     if(insertRet==B_OVRFLW){
         B_Node* newRoot=new B_Node;
@@ -165,8 +168,7 @@ RC B_Tree::Insert(B_Entry* newEntry){
         header.root=newRoot->header.pageNum;
         root_ptr=newRoot;
     }
-    if(newNode)
-        delete newNode;
+    DelRoot();
     return 0;
 }
 RC B_Node::RemoveEntry(int pos) {
@@ -183,8 +185,10 @@ RC B_Tree::Delete(B_Entry* b_entry) {
     BDEL cret = root_ptr->Delete(b_entry);
     if (cret == B_UNDRFLW)
         header.root = root_ptr->entries[0]->son;
-    if (cret == B_NOTFOUND);
-    return IX_DELETE_NOT_FOUND;
+    if (cret == B_NOTFOUND)
+        return IX_DELETE_NOT_FOUND;
+    DelRoot();
+    return 0;
 }
 
 BDEL B_Node::Delete(B_Entry* b_entry){
@@ -268,10 +272,10 @@ B_Node::~B_Node() {
     if(dirty){
         memcpy(data,&header,sizeof(B_NodeHeader));
     }
-    if(entries){
+    if(header.numEntries){
         int offset=sizeof(B_NodeHeader);
         int size=b_tree->GetEntrySize(header.level);
-        for(int i=0;i<header.capacity;i++){
+        for(int i=0;i<header.numEntries;i++){
             if(entries[i]){
                 entries[i]->WriteToPage(data+offset+size*i);
                 delete entries[i];
@@ -279,11 +283,14 @@ B_Node::~B_Node() {
         }
         delete []entries;
     }
+    b_tree->pffh.UnpinPage(pageNum);
     b_tree->pffh.ForcePages(pageNum);
 }
 RC B_Node::TreatOverFlow(B_Node *&b_node) {
     b_node=new B_Node;
-    b_node->Init(header.level,b_tree);
+    RC rc;
+    if(rc=b_node->Init(header.level,b_tree))
+        return rc;
     int i=(header.capacity-1)/2;
     while(i<header.numEntries){
         b_node->Enter(entries[i]);
@@ -294,13 +301,15 @@ RC B_Node::TreatOverFlow(B_Node *&b_node) {
     b_node->header.leftSibling=header.pageNum;
     header.rightSibling=b_node->header.pageNum;
 
-    if(b_node->header.rightSibling!=-1){
+    if(b_node->header.rightSibling!=NULL_PAGE){
         B_Node* node=new B_Node();
         node->Init(b_tree,b_node->header.rightSibling);
         node->header.leftSibling=b_node->header.pageNum;
         node->MarkDirty();
         delete node;
     }
+
+    return 0;
 }
 
 RC B_Node::TreatUnderFlow(int follow){
@@ -360,9 +369,11 @@ RC B_Node::TreatUnderFlow(int follow){
 
 
 B_Node* B_Entry::GetSon(){
+    RC rc;
     if(son_ptr==NULL){
         son_ptr=new B_Node();
-        son_ptr->Init(b_tree,son);
+        if(rc=son_ptr->Init(b_tree,son))
+            cout<<rc;
     }
     return son_ptr;
 }
@@ -410,7 +421,9 @@ RC B_Node::AddNewSon(B_Node* b_node){
     B_Entry* b_entry=new B_Entry;
     b_entry->Init(b_tree,header.level);
     b_entry->SetFromSon(b_node);
-
+    Enter(b_entry);
+    delete b_entry;
+    delete b_node;
 }
 
 RC B_Node::MarkDirty() {
@@ -436,7 +449,7 @@ RC B_Node::Enter(B_Entry* b_entry){
 }
 B_Node* B_Node::GetRightSibling(){
     B_Node* ret=NULL;
-    if(header.rightSibling!=-1){
+    if(header.rightSibling!=NULL_PAGE){
         ret=new B_Node;
         ret->Init(b_tree,header.rightSibling);
     }

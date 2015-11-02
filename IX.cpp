@@ -9,6 +9,7 @@ RC IX_IndexHandle::InsertEntry(Value &data, const RID &rid){
         case FLOAT: newEntry->fkey=data.fData;break;
         case CHARN: newEntry->skey=data.strData;break;
     }
+    newEntry->rid=rid;
     return b_tree.Insert(newEntry);
 
 }
@@ -135,13 +136,13 @@ RC IX_Manager::CreateIndex(const string &fileName, int indexNo, AttrType attrTyp
     b_treeHeader.type=attrType;
 
     size_t numBytes = fwrite(&fileHeader, sizeof(fileHeader), 1, fid);
-    if (numBytes != sizeof(fileHeader)) {
+    if (numBytes != 1) {
         fclose(fid);
         unlink(fileName.c_str());
         return PF_SYSTEM_ERROR;
     }
     numBytes = fwrite(& b_treeHeader, sizeof( b_treeHeader), 1, fid);
-    if (numBytes != sizeof(b_treeHeader)) {
+    if (numBytes != 1) {
         fclose(fid);
         unlink(fileName.c_str());
         return PF_SYSTEM_ERROR;
@@ -160,7 +161,7 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
         return rc==PF_FILE_ALREADY_OPEN?IX_INDEX_ALREADY_OPEN:IX_INDEX_NOT_FOUND;
 
     size_t numBytes = fread(&(indexHandle.b_tree.header), sizeof(indexHandle.b_tree.header), 1, indexHandle.b_tree.pffh.fp);
-    if (numBytes != sizeof(B_TreeHeader)) {
+    if (numBytes != 1) {
         rc = PF_SYSTEM_ERROR;
         fclose(indexHandle.b_tree.pffh.fp);
         indexHandle.b_tree.pffh.fileOpen = false;
@@ -190,7 +191,7 @@ RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
         return PF_FILE_CLOSED;
     }
     if (indexHandle.b_tree.headerChanged) {
-        if (fseek(indexHandle.b_tree.pffh.fp, 0,B_TREE_HEADER_OFFSET) < 0) {
+        if (fseek(indexHandle.b_tree.pffh.fp,B_TREE_HEADER_OFFSET, SEEK_SET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&indexHandle.b_tree.header, sizeof(B_TreeHeader), 1, indexHandle.b_tree.pffh.fp) != 1) {

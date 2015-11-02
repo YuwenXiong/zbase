@@ -12,7 +12,7 @@ enum BDEL {B_NONE, B_UNDRFLW, B_NOTFOUND};
 class B_Node;
 class B_Entry;
 
-
+extern int count;
 struct  B_TreeHeader{
     PageNum root;
     int keysize;
