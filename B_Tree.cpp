@@ -32,12 +32,15 @@ RC B_Tree::LoadRoot(){
 RC B_Tree::DelRoot(){
     PageNum pageNum;
     RC rc;
-    if(rc=root_ptr->pfph.GetPageNum(pageNum))
-        return rc;
-    if(rc=pffh.ForcePages(pageNum))
-        return rc;
-    delete root_ptr;
-    root_ptr=NULL;
+    if(root_ptr){
+        if(rc=root_ptr->pfph.GetPageNum(pageNum))
+            return rc;
+        if(rc=pffh.ForcePages(pageNum))
+            return rc;
+        delete root_ptr;
+        root_ptr=NULL;
+    }
+
     return 0;
 }
 

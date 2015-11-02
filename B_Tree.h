@@ -38,7 +38,7 @@ private:
     B_TreeHeader header;
     B_Node* root_ptr;
     PF_FileHandle pffh;
-    bool headerChanged;
+
 
 public:
     B_Tree();
