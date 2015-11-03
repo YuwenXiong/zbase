@@ -29,7 +29,7 @@ private:
 
 class IX_IndexScan {
 public:
-    RC OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& value);
+    RC OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& value);
     RC GetNextEntry(RID &rid);
     RC CloseScan();
 

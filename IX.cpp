@@ -29,7 +29,7 @@ RC IX_IndexHandle::DeleteEntry(Value &data, const RID &rid){
 IX_Manager::IX_Manager(PF_Manager &pfm1) {
     pfm=&pfm1;
 }
-RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, Value& data){
+RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& data){
     ixh=&indexHandle;
     AttrType type=ixh->b_tree.header.type;
     cmpEntry=new B_Entry;
