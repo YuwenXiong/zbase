@@ -100,7 +100,7 @@ RC QL_Manager::Insert(const string &relation, vector<Value> values) {
     char* tupleData = new char[rcRecord.tupleLength];
     memset(tupleData, 0, sizeof(char) * rcRecord.tupleLength);
 
-    if (values.size() != rcRecord.tupleLength) {
+    if (values.size() != rcRecord.attrCount) {
         return QL_INVALID_ATTR_COUNT;
     }
 

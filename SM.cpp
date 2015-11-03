@@ -162,6 +162,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	if((rc = attrfh.GetRecord(rid, rec)) != 0)
 		return rc;
 	rec.GetData(pdata1);
+	attrRecord.indexNo = attrRecord.offset;
 	((AttrCatRecordC *)pdata1)->indexNo = attrRecord.offset;
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
 		return rc;
@@ -253,7 +254,7 @@ RC SM_Manager::DropIndex(const string &relationName, const string &attrName) {
 	value.type = CHARN;
 	value.strData = relationName;
 
-	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecord, relationName), EQ, value)) != 0)
+	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
 		return rc;
 
 	while(true) {

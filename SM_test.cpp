@@ -1,4 +1,5 @@
 #include "SM.h"
+#include "QL.h"
 #include <iostream>
 
 void print(const vector<AttrCatRecord> &v) {
@@ -16,6 +17,10 @@ int main() {
     vector<AttrInfo> attrs1, attrs2;
     vector<AttrCatRecord> attrRecords1, attrRecords2;
     AttrCatRecord attrRecord;
+    QL_Manager qlm(smm, ixm, rmm);
+    Value value;
+    vector<Value> values;
+    AttrCatRecord attrData;
 
     AttrInfo s1("studentID", INT, 4);
     AttrInfo s2("name", CHARN, 10);
@@ -39,8 +44,8 @@ int main() {
     if((rc = smm.CreateTable("Teacher", attrs2)) != 0)
         return rc;
 
-    if((rc = smm.DropTable("Student")))
-        return rc;
+//    if((rc = smm.DropTable("Student")))
+//        return rc;
 
     rc = smm.GetAttrInfo("Student", 2, attrRecords1);
     if((rc == SM_NOTFOUND))
@@ -56,6 +61,23 @@ int main() {
 
     print(attrRecords1);
     print(attrRecords2);
+
+        value.type = INT;
+        value.iData = 3;
+        values.push_back(value);
+        value.type = CHARN;
+        value.strData = "hello";
+        values.push_back(value);
+        if((rc = qlm.Insert("Student", values)))
+            return rc;
+
+    if((rc = smm.CreateIndex("Student", "studentID", "StuIndex")))
+        return rc;
+    if((rc = smm.DropIndex("StuIndex")))
+        return rc;
+
+    smm.GetAttrInfo("Student", "studentID", attrData);
+    cout << attrData.indexNo << endl;
 
     if ((rc = smm.CloseDb())) {
         return rc;

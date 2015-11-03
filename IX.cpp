@@ -1,5 +1,7 @@
 #include "IX.h"
 #include "zbase.h"
+#include <sstream>
+using namespace std;
 RC IX_IndexHandle::InsertEntry(Value &data, const RID &rid){
     AttrType type=b_tree.header.type;
     B_Entry* newEntry=new B_Entry;
@@ -130,7 +132,9 @@ RC IX_IndexScan::CloseScan(){
 RC IX_Manager::CreateIndex(const string &fileName, int indexNo, AttrType attrType, int attrLength) {
     FILE *fid; // file identifier, we don't expose fd to avoid portability problem
 
-    if ((fid = fopen(fileName.c_str(), "w")) == NULL) {
+    stringstream temp;
+    temp << indexNo;
+    if ((fid = fopen((fileName + temp.str()).c_str(), "w")) == NULL) {
         return PF_SYSTEM_ERROR;
     }
 
@@ -164,7 +168,10 @@ RC IX_Manager::CreateIndex(const string &fileName, int indexNo, AttrType attrTyp
 
 RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &indexHandle) {
     RC rc;
-    if(rc=pfm->OpenFile(fileName.c_str(),indexHandle.b_tree.pffh))
+
+    stringstream temp;
+    temp << indexNo;
+    if((rc=pfm->OpenFile((fileName + temp.str()).c_str(),indexHandle.b_tree.pffh)))
         return rc==PF_FILE_ALREADY_OPEN?IX_INDEX_ALREADY_OPEN:IX_INDEX_NOT_FOUND;
 
 //    if (fseek(indexHandle.b_tree.pffh.fp,B_TREE_HEADER_OFFSET, SEEK_SET) < 0) {
@@ -187,14 +194,16 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
 }
 RC IX_Manager::DestroyIndex(const string &fileName, int indexNo){
     RC rc;
-    if(rc=pfm->DestroyFile(fileName.c_str()))
+    stringstream temp;
+    temp << indexNo;
+    if((rc=pfm->DestroyFile((fileName + temp.str()).c_str())))
         return rc;
     return RC_OK;
 }
 
 RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
     RC rc;
-    if(rc=indexHandle.b_tree.DelRoot()){
+    if((rc=indexHandle.b_tree.DelRoot())){
         return rc;
     }
     if (!indexHandle.b_tree.pffh.fileOpen) {
