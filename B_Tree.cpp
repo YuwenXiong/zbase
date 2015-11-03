@@ -37,10 +37,10 @@ RC B_Tree::DelRoot(){
     PageNum pageNum;
     RC rc;
     if(root_ptr){
-        if(rc=root_ptr->pfph.GetPageNum(pageNum))
-            return rc;
-        if(rc=pffh.ForcePages(pageNum))
-            return rc;
+//        if(rc=root_ptr->pfph.GetPageNum(pageNum))
+//            return rc;
+//        if(rc=pffh.ForcePages(pageNum))
+//            return rc;
         delete root_ptr;
         root_ptr=NULL;
     }
@@ -66,6 +66,7 @@ B_Node::B_Node() {
 
 RC B_Node::Init(int level, B_Tree *b_tree) {
     this->b_tree=b_tree;
+    MarkDirty();
     header.level=level;
     header.numEntries=0;
     header.capacity=(PF_PAGE_SIZE-sizeof(B_NodeHeader))/(b_tree->GetEntrySize(level));
@@ -126,6 +127,7 @@ RC B_Entry::Init(B_Tree* b_tree1,const int &level){
     son_ptr=NULL;
     son=NULL_PAGE;
     this->level=level;
+    return RC_OK;
 }
 RC B_Entry::ReadFromPage(char* data){
     switch(b_tree->header.type){
@@ -162,6 +164,7 @@ RC B_Entry::SetFromSon(B_Node* nodeSon){
         case FLOAT: ikey=nodeSon->entries[0]->ikey;break;
         case CHARN: skey=nodeSon->entries[0]->skey;break;
     }
+    return RC_OK;
 }
 RC B_Tree::Insert(B_Entry* newEntry){
     LoadRoot();
@@ -240,6 +243,7 @@ RC B_Entry::DeleteSon() {
         delete son_ptr;
         son_ptr=NULL;
     }
+    return RC_OK;
 }
 
 
