@@ -13,10 +13,10 @@ B_Tree::B_Tree() {
 }
 
 RC B_Tree::Init() {
-    root_ptr=NewOneNode();
-    root_ptr->Init(0,this);
-    header.root=root_ptr->header.pageNum;
-    DelRoot();
+//    root_ptr=NewOneNode();
+//    root_ptr->Init(0,this);
+//    header.root=root_ptr->header.pageNum;
+//    DelRoot();
     root_ptr=NewOneNode();
     root_ptr->Init(0,this);
     header.root=root_ptr->header.pageNum;
@@ -280,9 +280,10 @@ B_Node::~B_Node() {
     if(header.numEntries){
         int offset=sizeof(B_NodeHeader);
         int size=b_tree->GetEntrySize(header.level);
-        for(int i=0;i<header.numEntries;i++){
+        for(int i=0;i<header.capacity;i++){
             if(entries[i]){
-                entries[i]->WriteToPage(data+offset+size*i);
+                if(i<header.numEntries)
+                    entries[i]->WriteToPage(data+offset+size*i);
                 delete entries[i];
             }
         }
