@@ -37,6 +37,8 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& da
     ixh->b_tree.LoadRoot();
     curNode=ixh->b_tree.root_ptr;
     curPos=0;
+    this->op=op;
+    B_Node* son;
     if(curNode->header.numEntries==0)
         return IX_NO_SCAN_RESULT;
     switch(type){
@@ -48,28 +50,28 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& da
     switch(op){
         case NE:case NO:case LT:case LE:
             while(curNode->header.level!=0){
-                B_Node* son=curNode->entries[0]->GetSon();
-                delete curNode;
-                curNode=son;
+                curNode=curNode->entries[0]->GetSon();
+//                delete curNode;
+//                curNode=son;
             }
             break;
         case GT:case GE:case EQ:
             while(curNode->header.level!=0){
                 for(int i=0;i<curNode->header.numEntries;i++){
                     if(i==(curNode->header.numEntries-1)){
-                        if(!curNode->entries[i]->Compare(GE,cmpEntry))
-                            return IX_NO_SCAN_RESULT;
-                        else{
-                            B_Node* son=curNode->entries[i]->GetSon();
-                            delete curNode;
-                            curNode=son;
+
+                            curNode=curNode->entries[i]->GetSon();
+//                            B_Node* son=curNode->entries[i]->GetSon();
+//                            delete curNode;
+//                            curNode=son;
                             break;
-                        }
+
                     }
-                    if(curNode->entries[i]->Compare(GE,cmpEntry)&&curNode->entries[i+1]->Compare(LT,cmpEntry)){
-                        B_Node* son=curNode->entries[i]->GetSon();
-                        delete curNode;
-                        curNode=son;
+                    if(curNode->entries[i]->Compare(LE,cmpEntry)&&curNode->entries[i+1]->Compare(GT,cmpEntry)){
+                        curNode=curNode->entries[i]->GetSon();
+//                        B_Node* son=curNode->entries[i]->GetSon();
+//                        delete curNode;
+//                        curNode=son;
                         break;
                     }
                 }
@@ -77,6 +79,11 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& da
             for(int i=0;i<curNode->header.numEntries;i++){
                 if(curNode->entries[i]->Compare(op,cmpEntry)){
                     curPos=i;
+                    break;
+                }
+                if(i==curNode->header.numEntries-1){
+
+                    curNode=NULL;
                     break;
                 }
             }

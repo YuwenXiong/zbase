@@ -373,7 +373,8 @@ RC B_Node::TreatUnderFlow(int follow){
         succ2->MarkDirty();
         entries[mergesub]->SetFromSon(succ1);
         entries[mergesub]->DeleteSon();
-        entries[follow]->DeleteFromFile();
+        entries[follow]->DeleteSon();
+        //entries[follow]->DeleteFromFile();
         RemoveEntry(follow);
     }
     MarkDirty();
