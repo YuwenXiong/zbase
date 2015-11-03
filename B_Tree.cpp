@@ -25,7 +25,9 @@ RC B_Tree::Init() {
 RC B_Tree::LoadRoot(){
     if(root_ptr==NULL){
         root_ptr=NewOneNode();
-        root_ptr->Init(this,header.root);
+        RC rc;
+        if(rc=root_ptr->Init(this,header.root))
+            return rc;
     }
     return 0;
 }

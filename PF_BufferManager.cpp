@@ -230,6 +230,7 @@ RC PF_BufferManager::ReadPage(FILE* fd, PageNum pageNum, char *dest) {
         return PF_SYSTEM_ERROR;
     }
     ssize_t numByte = fread(dest, pageSize, 1, fd);
+    // waiting for check
     if (numByte < 0) {
         return PF_SYSTEM_ERROR;
     } else if (numByte != 1) {

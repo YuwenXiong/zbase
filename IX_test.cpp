@@ -25,7 +25,8 @@ int main(){
 //        if(rc=ixih.InsertEntry(value,RID(i/10,i%10)))
 //            return rc;
 //    }
-//    ixm.CloseIndex(ixih);
+//    rc = ixm.CloseIndex(ixih);
+
     rc=ixm.OpenIndex("indextest",0,ixih);
     for(int i=535;i<565;i++){
         Value value;
