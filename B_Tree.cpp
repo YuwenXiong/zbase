@@ -17,10 +17,11 @@ RC B_Tree::Init() {
     root_ptr->Init(0,this);
     header.root=root_ptr->header.pageNum;
     DelRoot();
-    root_ptr=NewOneNode();
-    root_ptr->Init(0,this);
-    header.root=root_ptr->header.pageNum;
-    DelRoot();
+    // wating for check
+//    root_ptr=NewOneNode();
+//    root_ptr->Init(0,this);
+//    header.root=root_ptr->header.pageNum;
+//    DelRoot();
 }
 RC B_Tree::LoadRoot(){
     if(root_ptr==NULL){

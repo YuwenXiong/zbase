@@ -54,6 +54,7 @@ public:
         recordSize = x.recordSize;
         data = new char[recordSize];
         memcpy(data, x.data, recordSize);
+        return *this;
     }
     ~RM_Record();
     RC GetData(char* &data) const;
