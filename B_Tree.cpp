@@ -351,7 +351,7 @@ RC B_Node::TreatUnderFlow(int follow){
             succ1->Enter(succ2->entries[i]);
         if(follow<mergesub){
             succ1->header.leftSibling=succ2->header.leftSibling;
-            if(succ1->header.leftSibling!=1){
+            if(succ1->header.leftSibling!=NULL_PAGE){
                 B_Node* node=new B_Node();
                 node->Init(b_tree,succ1->header.leftSibling);
                 node->header.rightSibling=succ1->header.pageNum;
@@ -361,7 +361,7 @@ RC B_Node::TreatUnderFlow(int follow){
         }
         else{
             succ1->header.rightSibling=succ2->header.rightSibling;
-            if(succ1->header.rightSibling!=1){
+            if(succ1->header.rightSibling!=NULL_PAGE){
                 B_Node* node=new B_Node();
                 node->Init(b_tree,succ1->header.rightSibling);
                 node->header.rightSibling=succ1->header.pageNum;
@@ -371,6 +371,7 @@ RC B_Node::TreatUnderFlow(int follow){
         }
         succ1->MarkDirty();
         succ2->MarkDirty();
+        entries[mergesub]->SetFromSon(succ1);
         entries[mergesub]->DeleteSon();
         entries[follow]->DeleteSon();
         RemoveEntry(follow);

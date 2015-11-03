@@ -18,7 +18,7 @@ int main(){
         return rc;
     if(rc=ixm.OpenIndex("indextest",0,ixih))
         return rc;
-    for(int i=0;i<1000;i++){
+    for(int i=0;i<10000;i++){
         Value value;
         value.type=INT;
         value.iData=i;
@@ -28,11 +28,11 @@ int main(){
     if ((rc = ixm.CloseIndex(ixih))) {
         return rc;
     }
-//
+
     if ((rc=ixm.OpenIndex("indextest",0,ixih))) {
         return rc;
     }
-    for(int i=535;i<565;i++){
+    for(int i=0;i<1000;i++){
         Value value;
         value.type=INT;
         value.iData=i;
