@@ -373,13 +373,28 @@ RC B_Node::TreatUnderFlow(int follow){
         succ2->MarkDirty();
         entries[mergesub]->SetFromSon(succ1);
         entries[mergesub]->DeleteSon();
-        entries[follow]->DeleteSon();
+        entries[follow]->DeleteFromFile();
         RemoveEntry(follow);
     }
     MarkDirty();
     return 0;
 }
 
+RC B_Entry::DeleteFromFile(){
+    if(son_ptr){
+        PageNum pageNum;
+        RC rc;
+        if ((rc=son_ptr->pfph.GetPageNum(pageNum)))
+            return rc;
+        if ((rc=b_tree->pffh.UnpinPage(pageNum)))
+            return rc;
+        if((rc=b_tree->pffh.DisposePage(pageNum)))
+            return rc;
+        delete son_ptr;
+        son_ptr=NULL;
+    }
+    return RC_OK;
+}
 
 B_Node* B_Entry::GetSon(){
     RC rc;

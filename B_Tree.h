@@ -77,6 +77,7 @@ public:
     RC SetFromEntry(B_Entry* b_entry);
     B_Node* GetSon();
     RC DeleteSon();
+    RC DeleteFromFile();
     bool IsSameRecord(B_Entry* b_entry);
     bool Compare(CmpOp op,B_Entry* b_entry);
 
