@@ -163,7 +163,8 @@ RC PF_BufferManager::FlushPages(FILE *fd) {
                     }
                     bufTable[*slot].dirty = false;
                 }
-                if ((rc = hashTable.Delete(fd, bufTable[*slot].pageNum)) ||  (rc = InsertFree(*slot) || (rc = Unlink(*slot)))) {
+                int slotNum = *slot;
+                if ((rc = hashTable.Delete(fd, bufTable[slotNum].pageNum)) || (rc = Unlink(slotNum)) ||  (rc = InsertFree(slotNum))) {
                     return rc;
                 }
 //            }
