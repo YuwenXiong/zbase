@@ -160,6 +160,9 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
     if(rc=pfm->OpenFile(fileName.c_str(),indexHandle.b_tree.pffh))
         return rc==PF_FILE_ALREADY_OPEN?IX_INDEX_ALREADY_OPEN:IX_INDEX_NOT_FOUND;
 
+//    if (fseek(indexHandle.b_tree.pffh.fp,B_TREE_HEADER_OFFSET, SEEK_SET) < 0) {
+//        return PF_SYSTEM_ERROR;
+//    }
     size_t numBytes = fread(&(indexHandle.b_tree.header), sizeof(indexHandle.b_tree.header), 1, indexHandle.b_tree.pffh.fp);
     if (numBytes != 1) {
         rc = PF_SYSTEM_ERROR;
@@ -184,21 +187,20 @@ RC IX_Manager::DestroyIndex(const string &fileName, int indexNo){
 
 RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
     RC rc;
-    if(indexHandle.b_tree.root_ptr){
-        delete indexHandle.b_tree.root_ptr;
+    if(rc=indexHandle.b_tree.DelRoot()){
+        return rc;
     }
     if (!indexHandle.b_tree.pffh.fileOpen) {
         return PF_FILE_CLOSED;
     }
-    if (indexHandle.b_tree.headerChanged) {
+
         if (fseek(indexHandle.b_tree.pffh.fp,B_TREE_HEADER_OFFSET, SEEK_SET) < 0) {
             return PF_SYSTEM_ERROR;
         }
         if (fwrite(&indexHandle.b_tree.header, sizeof(B_TreeHeader), 1, indexHandle.b_tree.pffh.fp) != 1) {
             return PF_WRITE_ERROR;
         }
-        indexHandle.b_tree.headerChanged = false;
-    }
+
     indexHandle.b_tree.DelRoot();
     if((rc=indexHandle.b_tree.pffh.ForcePages()))
         return rc;

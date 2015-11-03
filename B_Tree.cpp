@@ -26,19 +26,24 @@ RC B_Tree::Init() {
 RC B_Tree::LoadRoot(){
     if(root_ptr==NULL){
         root_ptr=NewOneNode();
-        root_ptr->Init(this,header.root);
+        RC rc;
+        if(rc=root_ptr->Init(this,header.root))
+            return rc;
     }
     return 0;
 }
 RC B_Tree::DelRoot(){
     PageNum pageNum;
     RC rc;
-    if(rc=root_ptr->pfph.GetPageNum(pageNum))
-        return rc;
-    if(rc=pffh.ForcePages(pageNum))
-        return rc;
-    delete root_ptr;
-    root_ptr=NULL;
+    if(root_ptr){
+        if(rc=root_ptr->pfph.GetPageNum(pageNum))
+            return rc;
+        if(rc=pffh.ForcePages(pageNum))
+            return rc;
+        delete root_ptr;
+        root_ptr=NULL;
+    }
+
     return 0;
 }
 

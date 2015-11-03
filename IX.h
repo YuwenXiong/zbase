@@ -13,7 +13,7 @@
 #include <string>
 using namespace std;
 
-const size_t B_TREE_HEADER_OFFSET=sizeof(PF_PageHeader);
+const size_t B_TREE_HEADER_OFFSET=sizeof(PF_FileHeader);
 
 class IX_IndexHandle {
     friend class IX_Manager;
