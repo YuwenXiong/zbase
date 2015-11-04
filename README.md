@@ -38,12 +38,6 @@ optional:
 
 ## Work
 
-### work wait to allocate
-
-- Unit test (dirty)
-- Test case (dirty)
-- Catalog Manager
-
 ### xyw
 - Interpreter
 - API
@@ -53,5 +47,5 @@ optional:
 - Record Manager
 - Index Manager
 
-
 ### dqm
+- Catalog Manager

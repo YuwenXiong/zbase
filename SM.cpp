@@ -187,7 +187,16 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return rc;
 	if((rc = rmm.OpenFile(relationName, rmfh)) != 0)
 		return rc;
-	if((rc = rmfs.OpenScan(rmfh, attrRecord.attrType, attrRecord.attrLength, attrRecord.offset, NO, value)) != 0)
+
+	rc = rmfs.OpenScan(rmfh, attrRecord.attrType, attrRecord.attrLength, attrRecord.offset, NO, value);
+	if(rc == RM_SCAN_EMPTY_RECORD) {
+		if((rc = rmm.CloseFile(rmfh)) != 0)
+			return rc;
+		if((rc = ixm.CloseIndex(ixh)) != 0)
+			return rc;
+		return 0;
+	}
+	else if(rc != 0)
 		return rc;
 
 	while(true) {

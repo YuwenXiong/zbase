@@ -3,8 +3,10 @@
 #include <iostream>
 
 void print(const vector<AttrCatRecord> &v) {
+    cout << v[0].relationName << endl;
+
     for(int i = 0; i < v.size(); i++) {
-        cout << v[i].relationName << v[i].attrName << endl;
+        cout << v[i].attrName << endl;
     }
 }
 
@@ -19,17 +21,17 @@ int main() {
     AttrCatRecord attrRecord;
     QL_Manager qlm(smm, ixm, rmm);
     Value value;
-    vector<Value> values;
+    vector<Value> values[10];
     AttrCatRecord attrData;
 
-    AttrInfo s1("studentID", INT, 4);
+    AttrInfo s1("ID", INT, 4);
     AttrInfo s2("name", CHARN, 10);
     attrs1.push_back(s1);
     attrs1.push_back(s2);
 
-    AttrInfo s3("techerID", FLOAT, 4);
+    AttrInfo s3("ID", INT, 4);
     AttrInfo s4("name", CHARN, 8);
-    AttrInfo s5("salary", INT, 4);
+    AttrInfo s5("salary", FLOAT, 4);
     attrs2.push_back(s3);
     attrs2.push_back(s4);
     attrs2.push_back(s5);
@@ -48,13 +50,13 @@ int main() {
 //        return rc;
 
     rc = smm.GetAttrInfo("Student", 2, attrRecords1);
-    if((rc == SM_NOTFOUND))
+    if(rc == SM_NOTFOUND)
         cout << "Not Found!" << endl;
     else if((rc))
         return rc;
 
     rc = smm.GetAttrInfo("Teacher", 3, attrRecords2);
-    if((rc == SM_NOTFOUND))
+    if(rc == SM_NOTFOUND)
         cout << "Not Found!" << endl;
     else if((rc))
         return rc;
@@ -62,21 +64,24 @@ int main() {
     print(attrRecords1);
     print(attrRecords2);
 
-        value.type = INT;
-        value.iData = 3;
-        values.push_back(value);
-        value.type = CHARN;
-        value.strData = "hello";
-        values.push_back(value);
-        if((rc = qlm.Insert("Student", values)))
-            return rc;
-
-    if((rc = smm.CreateIndex("Student", "studentID", "StuIndex")))
+    if((rc = smm.CreateIndex("Student", "ID", "StuIndex")))
         return rc;
+
+    for(int i = 0; i < 10; i++) {
+        value.type = INT;
+        value.iData = i;
+        values[i].push_back(value);
+        value.type = CHARN;
+        value.strData = "Tom" + i;
+        values[i].push_back(value);
+        if ((rc = qlm.Insert("Student", values[i])))
+            return rc;
+    }
+
     if((rc = smm.DropIndex("StuIndex")))
         return rc;
 
-    smm.GetAttrInfo("Student", "studentID", attrData);
+    smm.GetAttrInfo("Student", "ID", attrData);
     cout << attrData.indexNo << endl;
 
     if ((rc = smm.CloseDb())) {
