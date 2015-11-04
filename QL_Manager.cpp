@@ -15,18 +15,18 @@ QL_Manager::QL_Manager(SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm) {
 QL_Manager::~QL_Manager() { }
 
 // actually we would query all attrs and only one relation
-RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> &relations,
+RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
                       const vector <Condition> &conditions) {
     RC rc;
     RelationCatRecord rcRecord;
     AttrCatRecord attr;
     int attrCount;
-    if ((rc = smManager->GetRelationInfo(relations[0], rcRecord))) {
+    if ((rc = smManager->GetRelationInfo(relation, rcRecord))) {
         return rc;
     }
     attrCount = rcRecord.attrCount;
     vector<AttrCatRecord> attrs;
-    if ((rc = smManager->GetAttrInfo(relations[0], attrCount, attrs))) {
+    if ((rc = smManager->GetAttrInfo(relation, attrCount, attrs))) {
         return rc;
     }
 
@@ -43,11 +43,11 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     bool useIndex = false;
     vector<Condition> changedCondition(conditions);
     for (auto i = changedCondition.begin(); i != changedCondition.end(); ) {
-        if ((rc = smManager->GetAttrInfo(relations[0], (i->lAttr).attrName, attr))) {
+        if ((rc = smManager->GetAttrInfo(relation, (i->lAttr).attrName, attr))) {
             return rc;
         }
         if (attr.indexNo != -1) {
-            scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relations[0], (i->lAttr).attrName, i->op, i->rValue));
+            scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, (i->lAttr).attrName, i->op, i->rValue));
             i = changedCondition.erase(i);
             useIndex = true;
         } else {
@@ -56,7 +56,7 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     }
 
     if (!useIndex) {
-        scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relations[0]));
+        scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation));
     }
 
     auto lastHandle = scanHandle;
@@ -70,7 +70,7 @@ RC QL_Manager::Select(vector <RelationAttr> &selectAttrs, const vector <string> 
     }
 
     shared_ptr<QL_ScanHandle> rootHandle;
-    rootHandle.reset(new QL_RootHandle(smManager, lastHandle, relations[0]));
+    rootHandle.reset(new QL_RootHandle(smManager, lastHandle, relation));
 
 
     Printer printer(attrs);

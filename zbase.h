@@ -121,6 +121,8 @@ struct Value {
 struct RelationAttr {
     string relationName;
     string attrName;
+    RelationAttr(){}
+    RelationAttr(string x): attrName(x) {}
 };
 
 struct Condition {

@@ -156,7 +156,10 @@ delete
     };
 
 attrList
-    : attrList T_COMMA attrCat {
+    : attrCat {
+        $$ = $1;
+    }
+    | attrList T_COMMA attrCat {
         $$ = $1;
         $$.attrs.push_back($3.attrs[0]);
     }
@@ -168,9 +171,6 @@ attrList
                 break;
             }
         }
-    }
-    | attrCat {
-        $$ = $1;
     };
 
 attrCat
@@ -185,28 +185,32 @@ attrCat
     };
 
 valueList
-    : valueList T_COMMA value {
+    : value {
+        $$ = $1;
+    }
+    | valueList T_COMMA value {
         $$.values = $1.values;
         $$.values.push_back($3.values[0]);
-    }
-    | value {
-        $$.values.push_back($1.values[0]);
     };
 
 value
     : ANYTOKEN {
+        $$.values.clear();
         $$.values.push_back(Value($1.substr(1, $1.length() - 2)));
         $$.type = VALUE;
     }
     | P_INT {
+        $$.values.clear();
         $$.values.push_back(Value($1));
         $$.type = VALUE;
     }
     | NUM {
+        $$.values.clear();
         $$.values.push_back(Value($1));
         $$.type = VALUE;
     }
     | P_FLOAT {
+        $$.values.clear();
         $$.values.push_back(Value($1));
         $$.type = VALUE;
     };
@@ -220,16 +224,17 @@ whereClause
     };
 
 condList
-    : condList T_AND cond {
+    : cond {
+        $$.conditions = $1.conditions;
+    }
+    | condList T_AND cond {
         $$.conditions = $1.conditions;
         $$.conditions.push_back($3.conditions[0]);
-    }
-    | cond {
-        $$.conditions = $1.conditions;
     };
 
 cond
     : IDENTIFIER OP value {
+        $$.conditions.clear();
         $$.conditions.push_back(Condition($1, $2, $3.values[0]));
     };
 

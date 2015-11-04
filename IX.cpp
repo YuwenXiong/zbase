@@ -185,10 +185,10 @@ RC IX_Manager::OpenIndex(const string &fileName, int indexNo, IX_IndexHandle &in
         return rc;
     }
     if(indexHandle.b_tree.header.root==NULL_PAGE){
-        if(rc=indexHandle.b_tree.Init())
+        if((rc=indexHandle.b_tree.Init()))
             return rc;
     }
-    if(rc=indexHandle.b_tree.LoadRoot())
+    if((rc=indexHandle.b_tree.LoadRoot()))
         return rc;
     return 0;
 }

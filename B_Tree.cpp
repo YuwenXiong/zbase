@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <assert.h>
 #include "B_Tree.h"
 #include "RM.h"
 #include "IX.h"
@@ -23,12 +24,13 @@ RC B_Tree::Init() {
 //    root_ptr->Init(0,this);
 //    header.root=root_ptr->header.pageNum;
 //    DelRoot();
+    return RC_OK;
 }
 RC B_Tree::LoadRoot(){
     if(root_ptr==NULL){
         root_ptr=NewOneNode();
         RC rc;
-        if(rc=root_ptr->Init(this,header.root))
+        if((rc=root_ptr->Init(this,header.root)))
             return rc;
     }
     return 0;
@@ -71,26 +73,26 @@ RC B_Node::Init(int level, B_Tree *b_tree) {
     header.numEntries=0;
     header.capacity=(PF_PAGE_SIZE-sizeof(B_NodeHeader))/(b_tree->GetEntrySize(level));
     RC rc;
-    if(rc=b_tree->pffh.AllocatePage(pfph))
+    if((rc=b_tree->pffh.AllocatePage(pfph)))
         return rc;
     PageNum pageNum;
-    if(rc=pfph.GetPageNum(pageNum))
+    if((rc=pfph.GetPageNum(pageNum)))
         return rc;
     header.pageNum=pageNum;
-    if(rc=GetEntries())
+    if((rc=GetEntries()))
         return rc;
     return 0;
 }
 RC B_Node::Init(B_Tree *b_tree, int pageNum) {
     this->b_tree=b_tree;
     RC rc;
-    if(rc=b_tree->pffh.GetThisPage(pageNum,pfph))
+    if((rc=b_tree->pffh.GetThisPage(pageNum,pfph)))
         return rc;
     char* data;
-    if(rc=pfph.GetData(data))
+    if((rc=pfph.GetData(data)))
         return rc;
     memcpy(&header,data,sizeof(B_NodeHeader));
-    if(rc=GetEntries())
+    if((rc=GetEntries()))
         return rc;
     int offset=sizeof(B_NodeHeader);
     for(int i=0;i<header.numEntries;i++){
@@ -267,9 +269,11 @@ bool B_Node::CheckOverFlow(){
 }
 bool B_Node::CheckUnderFlow() {
     if(b_tree->root_ptr->header.level==header.level)
-        if(header.numEntries==1&&header.level>0)
+        if(header.numEntries==1&&header.level>0) {
             return true;
-        else return false;
+        } else {
+            return false;
+        }
     if(header.numEntries<=(header.capacity-2)/2)return true;
     else return false;
 }
@@ -301,7 +305,7 @@ B_Node::~B_Node() {
 RC B_Node::TreatOverFlow(B_Node *&b_node) {
     b_node=new B_Node;
     RC rc;
-    if(rc=b_node->Init(header.level,b_tree))
+    if((rc=b_node->Init(header.level,b_tree)))
         return rc;
     int i=(header.capacity-1)/2;
     while(i<header.numEntries){
@@ -401,7 +405,7 @@ B_Node* B_Entry::GetSon(){
     RC rc;
     if(son_ptr==NULL){
         son_ptr=new B_Node();
-        if(rc=son_ptr->Init(b_tree,son))
+        if((rc=son_ptr->Init(b_tree,son)))
             cout<<rc;
     }
     return son_ptr;
@@ -453,6 +457,7 @@ RC B_Node::AddNewSon(B_Node* b_node){
     Enter(b_entry);
     delete b_entry;
     delete b_node;
+    return RC_OK;
 }
 
 RC B_Node::MarkDirty() {
@@ -467,7 +472,7 @@ RC B_Node::Enter(B_Entry* b_entry){
     pos=MaxLEKeyPos(b_entry);
     pos++;
     RC rc;
-    if(rc=MarkDirty())
+    if((rc=MarkDirty()))
         return rc;
     for(int i=header.numEntries;i>pos;i--){
         entries[i]->SetFromEntry(entries[i-1]);
@@ -562,4 +567,5 @@ bool B_Entry::Compare(CmpOp op,B_Entry* b_entry){
                 return true;
         }
     }
+    assert(0);
 }

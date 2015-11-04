@@ -26,7 +26,6 @@ typedef enum {
 
 struct State {
     nodeType type;
-
     string relationName;
     string indexName;
     string attrName;
@@ -34,6 +33,11 @@ struct State {
     vector<AttrInfo> attrs;
     vector<Value> values;
     vector<Condition> conditions;
+    void clear() {
+        attrs.clear();
+        values.clear();
+        conditions.clear();
+    }
 };
 
 struct Type {
