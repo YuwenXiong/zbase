@@ -216,7 +216,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
         }
     }
     if(!insertAtTail)
-        header.firstFreeSlot=*(RID*)(pfph.pageData+slotNumF*header.slotSize+sizeof(bool));
+        header.firstFreeSlot=*(RID*)(pfph.pageData+slotNumF*header.slotSize+4);
     else
         header.firstFreeSlot=RID(pageNumF,slotNumF+1);
     RM_SlotHeader slotHeader;
