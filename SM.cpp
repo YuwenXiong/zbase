@@ -142,8 +142,21 @@ RC SM_Manager::DropTable(const string &relationName) {
 
 		rec.GetData(data);
 		if(relationName == ((AttrCatRecordC *)data)->relationName) {
-			if(((AttrCatRecordC *)data)->indexNo != -1)
-				DropIndex(relationName, ((AttrCatRecordC *)data)->attrName);
+			if(((AttrCatRecordC *)data)->indexNo != -1) {
+				map<string, string> m;
+				auto it = m.begin();
+				string s1 = ((AttrCatRecordC *)data)->relationName;
+				string s2 = ((AttrCatRecordC *)data)->attrName;
+				string s = s1 + "," + s2;
+
+				mapGet(m);
+				for( ; it != m.end(); it++) {
+					if(it->second == s)
+						break;
+				}
+				
+				DropIndex(it->first);
+			}
 			rec.GetRid(rid);
 			if((rc = attrfh.DeleteRecord(rid)) != 0)
 				return rc;
