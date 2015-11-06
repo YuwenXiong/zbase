@@ -185,12 +185,12 @@ RC QL_FileScanHandle::GetNext(RID &rid) {
 //    attrs = this->attrs;
 //}
 
-QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, const string &relationName) {
+QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child) {
     smManager = smm;
     child = _child;
-    RelationCatRecord rcRecord;
-    smManager->GetRelationInfo(relationName, rcRecord);
-    tupleLength = rcRecord.tupleLength;
+//    RelationCatRecord rcRecord;
+//    smManager->GetRelationInfo(relationName, rcRecord);
+//    tupleLength = rcRecord.tupleLength;
 }
 
 QL_RootHandle::~QL_RootHandle() { }
@@ -226,11 +226,11 @@ RC QL_RootHandle::GetNext(char *recordData) {
 }
 
 
-QL_FilterHandle::QL_FilterHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, Condition _filter): filter(_filter) {
+QL_FilterHandle::QL_FilterHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, Condition _filter, const string &relationName): filter(_filter) {
     smManager = smm;
     child = _child;
     RelationCatRecord rcRecord;
-    smManager->GetRelationInfo(filter.lAttr.relationName, rcRecord);
+    smManager->GetRelationInfo(relationName, rcRecord);
     tupleLength = rcRecord.tupleLength;
 }
 

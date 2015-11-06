@@ -108,8 +108,10 @@ RC IX_IndexScan::GetNextEntry(RID &rid){
                     return IX_EOF;
         }
         if((++curPos)==curNode->header.numEntries) {
-            if (curNode->header.rightSibling == -1) {
-                delete curNode;
+            if (curNode->header.rightSibling == NULL_PAGE) {
+                if (curNode != ixh->b_tree.root_ptr)
+                    delete curNode;
+                curNode = NULL;
             }
             else {
                 B_Node *right = curNode->GetRightSibling();
@@ -125,7 +127,7 @@ RC IX_IndexScan::GetNextEntry(RID &rid){
 RC IX_IndexScan::CloseScan(){
     if(cmpEntry)
         delete cmpEntry;
-    if(curNode)
+    if(curNode != NULL && curNode != ixh->b_tree.root_ptr)
         delete curNode;
     return 0;
 }

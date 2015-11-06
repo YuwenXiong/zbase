@@ -156,10 +156,7 @@ delete
     };
 
 attrList
-    : attrCat {
-        $$ = $1;
-    }
-    | attrList T_COMMA attrCat {
+    : attrList T_COMMA attrCat {
         $$ = $1;
         $$.attrs.push_back($3.attrs[0]);
     }
@@ -171,6 +168,9 @@ attrList
                 break;
             }
         }
+    }
+    | attrCat {
+        $$ = $1;
     };
 
 attrCat
@@ -185,12 +185,12 @@ attrCat
     };
 
 valueList
-    : value {
-        $$ = $1;
-    }
-    | valueList T_COMMA value {
+    : valueList T_COMMA value {
         $$.values = $1.values;
         $$.values.push_back($3.values[0]);
+    }
+    | value {
+        $$ = $1;
     };
 
 value

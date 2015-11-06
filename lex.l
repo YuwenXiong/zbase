@@ -16,7 +16,7 @@ nondigit    [_A-Za-z]
 digit       [0-9]
 num         {digit}+
 int         [+\-]?{num}
-float       {int}\.{num}
+float       {int}\.{digit}*
 floate      {int}\.{num}[Ee]{int}
 identifier  {nondigit}({nondigit}|{digit})*
 single_quote '

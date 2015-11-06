@@ -39,7 +39,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
 //        selectAttrs.push_back(attrs[i]);
 //    }
 
-    shared_ptr<QL_ScanHandle> scanHandle;
+    shared_ptr<QL_ScanHandle> scanHandle, lastHandle;
     bool useIndex = false;
     vector<Condition> changedCondition(conditions);
     for (auto i = changedCondition.begin(); i != changedCondition.end(); ) {
@@ -59,18 +59,14 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
         scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relation));
     }
 
-    auto lastHandle = scanHandle;
-    if (changedCondition.size() > 0) {
-
-        vector<shared_ptr<QL_ScanHandle>> filterHandle(changedCondition.size());
-        for (int i = 0; i < changedCondition.size(); i++) {
-            filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i]));
-            lastHandle = filterHandle[i];
-        }
+    lastHandle = scanHandle;
+    vector<shared_ptr<QL_ScanHandle>> filterHandle(changedCondition.size());
+    for (int i = 0; i < changedCondition.size(); i++) {
+        filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i], relation));
+        lastHandle = filterHandle[i];
     }
-
     shared_ptr<QL_ScanHandle> rootHandle;
-    rootHandle.reset(new QL_RootHandle(smManager, lastHandle, relation));
+    rootHandle.reset(new QL_RootHandle(smManager, lastHandle));
 
 
     Printer printer(attrs);

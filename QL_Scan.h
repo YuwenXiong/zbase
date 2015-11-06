@@ -18,11 +18,7 @@ public:
         return QL_EOF;
     }
     virtual RC GetNext(char* data) = 0;
-    size_t GetTupleLength() {
-        return tupleLength;
-    };
-protected:
-    size_t tupleLength;
+//    virtual size_t GetTupleLength() = 0;
 //    virtual void GetAttrCount(int &attrCount) = 0;
 //    virtual void GetAttrInfo(vector<AttrCatRecord> &attrs) = 0;
 };
@@ -36,7 +32,9 @@ public:
     RC Close();
     RC GetNext(RID &rid);
     RC GetNext(char* data);
-//    size_t GetTupleLength();
+//    size_t GetTupleLength() {
+//        return tupleLength;
+//    };
 //    void GetAttrCount(int &attrCount);
 //    void GetAttrInfo(vector<AttrCatRecord> &attrs);
 
@@ -51,7 +49,7 @@ private:
     string relationName, attrName;
     CmpOp op;
     Value value;
-//    size_t tupleLength;
+    size_t tupleLength;
     int attrCount;
     vector<AttrCatRecord> attrs;
 };
@@ -65,7 +63,9 @@ public:
     RC Close();
     RC GetNext(RID &rid);
     RC GetNext(char* data);
-//    size_t GetTupleLength();
+//    size_t GetTupleLength() {
+//        return tupleLength;
+//    };
 //    void GetAttrCount(int &attrCount);
 //    void GetAttrInfo(vector<AttrCatRecord> &attrs);
 
@@ -79,13 +79,14 @@ private:
     CmpOp op;
     Value value;
     int attrCount;
+    size_t tupleLength;
     vector<AttrCatRecord> attrs;
 
 };
 
 class QL_RootHandle: public QL_ScanHandle {
 public:
-    QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, const string &relationName);
+    QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child);
     ~QL_RootHandle();
 
     RC Open();
@@ -100,7 +101,7 @@ private:
 
 class QL_FilterHandle: public QL_ScanHandle{
 public:
-    QL_FilterHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, Condition filter);
+    QL_FilterHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child, Condition filter, const string &relationName);
     ~QL_FilterHandle();
 
     RC Open();
@@ -111,4 +112,5 @@ private:
     SM_Manager* smManager;
     shared_ptr<QL_ScanHandle> child;
     Condition filter;
+    size_t tupleLength;
 };

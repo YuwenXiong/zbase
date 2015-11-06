@@ -65,37 +65,71 @@ void parser() {
                 switch (parseState.type) {
                     case CREATETABLE:
                         if ((rc = smm.CreateTable(parseState.relationName, parseState.attrs))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case DROPTABLE:
                         if ((rc = smm.DropTable(parseState.relationName))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case CREATEINDEX:
                         if ((rc = smm.CreateIndex(parseState.relationName, parseState.attrName, parseState.indexName))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                case SM_INDEXEXISTS: {
+                                    printf("index on %s already exists!\n", parseState.attrName.c_str());
+                                }
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case DROPINDEX:
                         if ((rc = smm.DropIndex(parseState.indexName))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                case SM_NOTFOUND: {
+                                    printf("index name not found!\n");
+                                }
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case SELECT:
                         if ((rc = qlm.Select(parseState.attrs, parseState.relationName, parseState.conditions))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case INSERT:
                         if ((rc = qlm.Insert(parseState.relationName, parseState.values))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     case DELETE:
                         if ((rc = qlm.Delete(parseState.relationName, parseState.conditions))) {
-                            printf("%d\n", rc);
+                            switch (rc) {
+                                default: {
+                                    printf("%d\n", rc);
+                                }
+                            }
                         }
                         break;
                     default:

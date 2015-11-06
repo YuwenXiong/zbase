@@ -19,7 +19,7 @@ int main(){
         return rc;
     if(rc=ixm.OpenIndex("indextest",0,ixih))
         return rc;
-    for(int i=0;i<10000;i++){
+    for(int i=0;i<1000;i++){
         Value value;
         value.type=INT;
         value.iData=i;
@@ -33,15 +33,15 @@ int main(){
     if ((rc=ixm.OpenIndex("indextest",0,ixih))) {
         return rc;
     }
-    for(int i=9500;i<10000;i++){
-        Value value;
-        value.type=INT;
-        value.iData=i;
-
-        if(rc=ixih.DeleteEntry(value,RID(i/10,i%10)))
-            return rc;
-    }
-    ixis.OpenScan(ixih,GE,Value(9250));
+//    for(int i=0;i<1;i++){
+//        Value value;
+//        value.type=INT;
+//        value.iData=i;
+//
+//        if(rc=ixih.DeleteEntry(value,RID(i/10,i%10)))
+//            return rc;
+//    }
+    ixis.OpenScan(ixih,GE,Value(1));
     RID id;
     while(ixis.GetNextEntry(id)!=IX_EOF){
         PageNum pageNum;
@@ -50,7 +50,12 @@ int main(){
         id.GetSlotNum(slotNum);
         cout<<pageNum<<"\t"<<slotNum<<endl;
     }
-
+    if ((rc = ixis.CloseScan())) {
+        return rc;
+    }
+    if ((rc = ixm.CloseIndex(ixih))) {
+        return rc;
+    }
 
      return 0;
 
