@@ -1,5 +1,5 @@
 drop table test;
-create table test (a int, b int unique, c float, d float unique, e char (100), primary key(e));
+create table test (a int, b int unique, c float, d float unique, e char (10), primary key(e));
 insert into test values (60, 74, 15.600000, 197.000000, 'K0UE3N');
 insert into test values (68, 99, 49.750000, 78.000000, 'PRFKWA');
 insert into test values (62, 71, 20.750000, 54.666667, 'QSBNKQ');

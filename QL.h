@@ -49,6 +49,7 @@ const RC QL_INVALID_ATTR_COUNT = QL_RC - 2;
 const RC QL_INVALID_ATTR_TYPE = QL_RC - 3;
 const RC QL_EOF = QL_RC - 4;
 const RC QL_UNIQUE_VALUE_EXISTS = QL_RC - 5;
+const RC QL_LENGTH_EXCEED = QL_RC - 6;
 
 
 #endif //ZBASE_QL_H

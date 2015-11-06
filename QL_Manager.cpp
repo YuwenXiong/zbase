@@ -114,6 +114,9 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> &values) {
         if (values[i].type != attrs[i].attrType) {
             return QL_INVALID_ATTR_TYPE;
         }
+        if (values[i].type == CHARN && values[i].strData.length() > attrs[i].attrLength) {
+            return QL_LENGTH_EXCEED;
+        }
         if (attrs[i].property != NONE && !checkUnique(relation, attrs[i], values[i], rcRecord.tupleLength)) {
             return QL_UNIQUE_VALUE_EXISTS;
         }

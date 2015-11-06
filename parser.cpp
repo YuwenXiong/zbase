@@ -152,6 +152,10 @@ void parser() {
                                 printf("Invalid attribute type. Please recheck the attribute type of '%s'\n", parseState.relationName.c_str());
                                 break;
                             }
+                            case QL_LENGTH_EXCEED: {
+                                printf("String length exceeded!\n");
+                                break;
+                            }
                             case QL_UNIQUE_VALUE_EXISTS: {
                                 printf("Trying to insert same value to a unique attribuate\n");
                                 break;
