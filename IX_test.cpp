@@ -19,10 +19,8 @@ int main(){
         return rc;
     if(rc=ixm.OpenIndex("indextest",0,ixih))
         return rc;
-    for(int i=0;i<1000;i++){
-        Value value;
-        value.type=INT;
-        value.iData=i;
+    for(int i=0;i<10;i++){
+        Value value((float)i);
         if(rc=ixih.InsertEntry(value,RID(i/10,i%10)))
             return rc;
     }
@@ -41,7 +39,7 @@ int main(){
 //        if(rc=ixih.DeleteEntry(value,RID(i/10,i%10)))
 //            return rc;
 //    }
-    ixis.OpenScan(ixih,GE,Value(1));
+    ixis.OpenScan(ixih,GE,Value((float)5.0));
     RID id;
     while(ixis.GetNextEntry(id)!=IX_EOF){
         PageNum pageNum;

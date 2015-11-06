@@ -84,7 +84,7 @@ RC IX_IndexScan::OpenScan(IX_IndexHandle &indexHandle, CmpOp op, const Value& da
                     break;
                 }
                 if(i==curNode->header.numEntries-1){
-
+                    delete curNode;
                     curNode=NULL;
                     break;
                 }
@@ -104,18 +104,19 @@ RC IX_IndexScan::GetNextEntry(RID &rid){
             rid=curNode->entries[curPos]->rid;
         }
         else if(op==LT||op==LE){
+                    delete curNode;
                     curNode=NULL;
                     return IX_EOF;
         }
         if((++curPos)==curNode->header.numEntries) {
             if (curNode->header.rightSibling == NULL_PAGE) {
-                if (curNode != ixh->b_tree.root_ptr)
                     delete curNode;
                 curNode = NULL;
             }
             else {
                 B_Node *right = curNode->GetRightSibling();
-                delete curNode;
+
+                    delete curNode;
                 curNode = right;
                 curPos = 0;
             }
@@ -205,9 +206,9 @@ RC IX_Manager::DestroyIndex(const string &fileName, int indexNo){
 
 RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
     RC rc;
-    if((rc=indexHandle.b_tree.DelRoot())){
-        return rc;
-    }
+//    if((rc=indexHandle.b_tree.DelRoot())){
+//        return rc;
+//    }
     if (!indexHandle.b_tree.pffh.fileOpen) {
         return PF_FILE_CLOSED;
     }
@@ -219,7 +220,7 @@ RC IX_Manager::CloseIndex(IX_IndexHandle &indexHandle) {
             return PF_WRITE_ERROR;
         }
 
-    indexHandle.b_tree.DelRoot();
+ //   indexHandle.b_tree.DelRoot();
     if((rc=indexHandle.b_tree.pffh.ForcePages()))
         return rc;
 
