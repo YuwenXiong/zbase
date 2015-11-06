@@ -436,7 +436,7 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	value.strData = relationName;
 
 	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)

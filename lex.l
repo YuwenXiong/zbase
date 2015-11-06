@@ -3,7 +3,7 @@
     #include <string.h>
     #include <algorithm>
     #include "common.h"
-    #include "yy.tab.h"
+    #include "yy.tab.hpp"
     #include <vector>
     using namespace std;
     int checkToken(string s);
@@ -170,7 +170,27 @@ int checkToken(string s) {
         return T_ON;
     if (s == "exit")
         return T_EXIT;
+    if (s == "exec")
+        return T_EXECFILE;
 
     yylval.sval = bs;
     return IDENTIFIER;
+}
+
+void yyerror(char const *s) {
+    string t1 = s, t2 = yytext;
+    char c;
+    if (t2 != ";")
+        while(yylex() != T_SEMICOLON);
+    if (strcmp(s, "Invalid string length!")) {
+        printf("%s near '%s'\n", s, t2.c_str());
+    } else {
+        puts(s);
+    }
+}
+
+int yywrap(void)
+{
+   yyin = stdin;
+   return 0;
 }

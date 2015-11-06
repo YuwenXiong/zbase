@@ -52,9 +52,10 @@ struct Type {
 #define YYSTYPE Type
 
 extern "C" {
+    extern int yywrap(void);
     extern int yylex(void);
 }
 
-void yyerror(const char *);
+
 
 #endif //ZBASE_COMMON_H

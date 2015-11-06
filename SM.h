@@ -16,6 +16,7 @@ using namespace std;
 
 const RC SM_NOTFOUND = SM_RC -1;
 const RC SM_INDEXEXISTS = SM_RC -2;
+const RC SM_TABLEEXISTS = SM_RC -3;
 
 class SM_Manager {
 private:

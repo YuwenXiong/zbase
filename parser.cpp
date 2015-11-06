@@ -33,39 +33,36 @@ void parser() {
 
     for(;;) {
         try {
+            cout << ">> ";
             if (yyparse() == 0 && parseState.type != EMPTY) {
-//            parseState.relationName = "a";
-//            parseState.type = CREATETABLE;
-//            AttrInfo x;
-//            x.attrName = "s";
-//            x.attrLength = 4;
-//            x.attrType = INT;
-//            x.property = NONE;
-//            parseState.attrs.push_back(x);
                 if (parseState.type == EXIT) {
                     smm.CloseDb();
                     break;
                 }
-                cout <<"type " <<  parseState.type << endl;
-                cout <<"relationName " << parseState.relationName << endl;
-                cout <<"attrName " << parseState.attrName << endl;
-                cout <<"indexName " << parseState.indexName << endl;
-                cout << "attrs: " << endl;
-                for (auto x: parseState.attrs) {
-                    cout << x.attrName << ' ' << x.attrLength << ' ' << x.attrType << ' ' << x.property << endl;
-                }
-                cout << "conditions: " << endl;
-                for (auto x: parseState.conditions) {
-                    cout << x.lAttr.attrName << ' ' << x.op << ' ' << x.rValue.type << ' ' << x.rValue.iData << ' ' << x.rValue.fData << ' ' << x.rValue.strData << endl;
-                }
-                cout << "values: " << endl;
-                for (auto x: parseState.values) {
-                    cout << x.type << ' ' << x.iData << ' ' << x.fData << ' ' << x.strData << endl;
-                }
+//                cout <<"type " <<  parseState.type << endl;
+//                cout <<"relationName " << parseState.relationName << endl;
+//                cout <<"attrName " << parseState.attrName << endl;
+//                cout <<"indexName " << parseState.indexName << endl;
+//                cout << "attrs: " << endl;
+//                for (auto x: parseState.attrs) {
+//                    cout << x.attrName << ' ' << x.attrLength << ' ' << x.attrType << ' ' << x.property << endl;
+//                }
+//                cout << "conditions: " << endl;
+//                for (auto x: parseState.conditions) {
+//                    cout << x.lAttr.attrName << ' ' << x.op << ' ' << x.rValue.type << ' ' << x.rValue.iData << ' ' << x.rValue.fData << ' ' << x.rValue.strData << endl;
+//                }
+//                cout << "values: " << endl;
+//                for (auto x: parseState.values) {
+//                    cout << x.type << ' ' << x.iData << ' ' << x.fData << ' ' << x.strData << endl;
+//                }
                 switch (parseState.type) {
                     case CREATETABLE:
                         if ((rc = smm.CreateTable(parseState.relationName, parseState.attrs))) {
                             switch (rc) {
+                                case SM_TABLEEXISTS: {
+                                    printf("Relation '%s' already exists!\n", parseState.relationName.c_str());
+                                    break;
+                                }
                                 default: {
                                     printf("%d\n", rc);
                                 }
@@ -75,6 +72,9 @@ void parser() {
                     case DROPTABLE:
                         if ((rc = smm.DropTable(parseState.relationName))) {
                             switch (rc) {
+                                case SM_NOTFOUND: {
+                                    printf("Relation '%s' not found!\n", parseState.relationName.c_str());
+                                }
                                 default: {
                                     printf("%d\n", rc);
                                 }
@@ -85,7 +85,8 @@ void parser() {
                         if ((rc = smm.CreateIndex(parseState.relationName, parseState.attrName, parseState.indexName))) {
                             switch (rc) {
                                 case SM_INDEXEXISTS: {
-                                    printf("index on %s already exists!\n", parseState.attrName.c_str());
+                                    printf("Index on '%s' already exists!\n", parseState.attrName.c_str());
+                                    break;
                                 }
                                 default: {
                                     printf("%d\n", rc);
@@ -97,7 +98,8 @@ void parser() {
                         if ((rc = smm.DropIndex(parseState.indexName))) {
                             switch (rc) {
                                 case SM_NOTFOUND: {
-                                    printf("index name not found!\n");
+                                    printf("Index '%s' not found!\n", parseState.indexName.c_str());
+                                    break;
                                 }
                                 default: {
                                     printf("%d\n", rc);
@@ -108,6 +110,14 @@ void parser() {
                     case SELECT:
                         if ((rc = qlm.Select(parseState.attrs, parseState.relationName, parseState.conditions))) {
                             switch (rc) {
+                                case SM_NOTFOUND: {
+                                    printf("Table '%s' not found!\n", parseState.relationName.c_str());
+                                    break;
+                                }
+                                case QL_INVALID_WHERE_CLAUSE: {
+                                    printf("Invalid condition\n");
+                                    break;
+                                }
                                 default: {
                                     printf("%d\n", rc);
                                 }
@@ -117,6 +127,18 @@ void parser() {
                     case INSERT:
                         if ((rc = qlm.Insert(parseState.relationName, parseState.values))) {
                             switch (rc) {
+                                case SM_NOTFOUND: {
+                                    printf("table '%s' not found!\n", parseState.relationName.c_str());
+                                    break;
+                                }
+                                case QL_INVALID_ATTR_COUNT: {
+                                    printf("Invalid attribute num. Please recheck the attribute num of '%s'\n", parseState.relationName.c_str());
+                                    break;
+                                }
+                                case QL_INVALID_ATTR_TYPE: {
+                                    printf("Invalid attribute type. Please recheck the attribute type of '%s'\n", parseState.relationName.c_str());
+                                    break;
+                                }
                                 default: {
                                     printf("%d\n", rc);
                                 }
@@ -126,6 +148,10 @@ void parser() {
                     case DELETE:
                         if ((rc = qlm.Delete(parseState.relationName, parseState.conditions))) {
                             switch (rc) {
+                                case SM_NOTFOUND: {
+                                    printf("table '%s' not found!\n", parseState.relationName.c_str());
+                                    break;
+                                }
                                 default: {
                                     printf("%d\n", rc);
                                 }

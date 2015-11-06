@@ -3,6 +3,8 @@
 #include <exception>
 #include "common.h"
 extern State parseState;
+extern FILE* yyin;
+extern void yyerror(const char *);
 
 %}
 
@@ -43,6 +45,7 @@ extern State parseState;
     T_EOF
     T_EXIT
     T_ABORT
+    T_EXECFILE
 
 %token<ival> P_INT NUM
 %token<fval> P_FLOAT
@@ -58,6 +61,7 @@ extern State parseState;
     dropTable
     createIndex
     dropIndex
+    execFile
     select
     insert
     delete
@@ -75,13 +79,14 @@ start
         parseState = $1;
         YYACCEPT;
     }
+    | execFile
     | T_EOF {
         parseState.type = EXIT;
         YYACCEPT;
     }
     | T_ABORT {
         YYABORT;
-    };
+    }
 
 command
     : ddl
@@ -131,6 +136,18 @@ dropIndex
         $$.indexName = $3;
     };
 
+execFile
+    : T_EXECFILE IDENTIFIER T_SEMICOLON {
+        $$.type = EMPTY;
+        FILE *fp = fopen($2.c_str(), "r");
+        if (fp == NULL) {
+            printf("Open file error!\n");
+        } else {
+            yyin = fp;
+        }
+        YYACCEPT;
+    }
+
 select
     : T_SELECT T_STAR T_FROM IDENTIFIER whereClause {
         $$.type = SELECT;
@@ -175,7 +192,11 @@ attrList
 
 attrCat
     : IDENTIFIER T_CHAR T_LEFT_BRACKET NUM T_RIGHT_BRACKET property {
-        $$.attrs.push_back(AttrInfo($1, CHARN, $4, $6));
+        if ($4 >= 1 && $4 <= 255) {
+            $$.attrs.push_back(AttrInfo($1, CHARN, $4, $6));
+        } else {
+            yyerror("Invalid string length!");
+        }
     }
     | IDENTIFIER T_INT property{
         $$.attrs.push_back(AttrInfo($1, INT, sizeof(int), $3));
@@ -249,11 +270,3 @@ property
 
 %%
 
-void yyerror(char const *s) {
-    throw s;
-}
-
-int yywrap(void)
-{
-   return 1;
-}

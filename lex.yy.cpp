@@ -333,9 +333,6 @@ void yyfree (void *  );
 
 /* Begin user sect3 */
 
-#define yywrap(n) 1
-#define YY_SKIP_YYWRAP
-
 typedef unsigned char YY_CHAR;
 
 FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
@@ -477,11 +474,11 @@ char *yytext;
     #include <string.h>
     #include <algorithm>
     #include "common.h"
-    #include "yy.tab.h"
+    #include "yy.tab.hpp"
     #include <vector>
     using namespace std;
     int checkToken(string s);
-#line 485 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 482 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 #define INITIAL 0
 
@@ -666,7 +663,7 @@ YY_DECL
 #line 27 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 
 
-#line 670 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 667 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -913,7 +910,7 @@ YY_RULE_SETUP
 #line 127 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 ECHO;
 	YY_BREAK
-#line 917 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 914 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1956,7 +1953,28 @@ int checkToken(string s) {
         return T_ON;
     if (s == "exit")
         return T_EXIT;
+    if (s == "exec")
+        return T_EXECFILE;
 
     yylval.sval = bs;
     return IDENTIFIER;
 }
+
+void yyerror(char const *s) {
+    string t1 = s, t2 = yytext;
+    char c;
+    if (t2 != ";")
+        while(yylex() != T_SEMICOLON);
+    if (strcmp(s, "Invalid string length!")) {
+        printf("%s near '%s'\n", s, t2.c_str());
+    } else {
+        puts(s);
+    }
+}
+
+int yywrap(void)
+{
+   yyin = stdin;
+   return 0;
+}
+

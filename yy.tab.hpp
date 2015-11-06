@@ -74,12 +74,13 @@
      T_EOF = 290,
      T_EXIT = 291,
      T_ABORT = 292,
-     P_INT = 293,
-     NUM = 294,
-     P_FLOAT = 295,
-     OP = 296,
-     IDENTIFIER = 297,
-     ANYTOKEN = 298
+     T_EXECFILE = 293,
+     P_INT = 294,
+     NUM = 295,
+     P_FLOAT = 296,
+     OP = 297,
+     IDENTIFIER = 298,
+     ANYTOKEN = 299
    };
 #endif
 /* Tokens.  */
@@ -118,12 +119,13 @@
 #define T_EOF 290
 #define T_EXIT 291
 #define T_ABORT 292
-#define P_INT 293
-#define NUM 294
-#define P_FLOAT 295
-#define OP 296
-#define IDENTIFIER 297
-#define ANYTOKEN 298
+#define T_EXECFILE 293
+#define P_INT 294
+#define NUM 295
+#define P_FLOAT 296
+#define OP 297
+#define IDENTIFIER 298
+#define ANYTOKEN 299
 
 
 

@@ -22,6 +22,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
     AttrCatRecord attr;
     int attrCount;
     if ((rc = smManager->GetRelationInfo(relation, rcRecord))) {
+
         return rc;
     }
     attrCount = rcRecord.attrCount;

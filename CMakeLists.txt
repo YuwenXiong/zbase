@@ -9,7 +9,7 @@ add_custom_command(
 find_package(FLEX REQUIRED)
 add_custom_command(
         OUTPUT ${CMAKE_SOURCE_DIR}/lex.yy.cpp
-        COMMAND ${FLEX_EXECUTABLE} --noyywrap --outfile=${CMAKE_SOURCE_DIR}/lex.yy.cpp ${CMAKE_SOURCE_DIR}/lex.l
+        COMMAND ${FLEX_EXECUTABLE} --outfile=${CMAKE_SOURCE_DIR}/lex.yy.cpp ${CMAKE_SOURCE_DIR}/lex.l
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -26,8 +26,6 @@ set(IX_TEST_FILES IX.h IX.cpp  B_Tree.cpp B_Tree.h IX_test.cpp RM.cpp RM.h)
 set(RM_TEST_FILES RM.cpp RM.h RM_test.cpp)
 
 
-#add_dependencies(yy.tab.o yy.tab.c)
-#add_dependencies(lex.yy.o lex.yy.c)
 add_executable(zbase ${SOURCE_FILES} ${PARSER_FILES})
 add_executable(pf_test ${PF_TEST_FILES})
 add_executable(sm_test ${SM_TEST_FILES} ${PF_TEST_FILES})

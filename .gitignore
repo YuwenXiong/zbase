@@ -3,6 +3,10 @@
 *.iml
 *.o
 PF_TEST.cpp
+CMakeFiles/
+Makefile
+CMakeCache.txt
+cmake_install.cmake
 
 ## Directory-based project format:
 .idea/
