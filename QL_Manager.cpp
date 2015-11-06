@@ -160,9 +160,6 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> &values) {
                 assert(0);
         }
     }
-    if (values[4].strData == "LHUN3O") {
-        cout << values[4].strData;
-    }
     if ((rc = rmFH.InsertRecord(tupleData, rid))) {
         return rc;
     }
