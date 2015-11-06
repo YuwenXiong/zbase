@@ -107,7 +107,8 @@
      P_FLOAT = 296,
      OP = 297,
      IDENTIFIER = 298,
-     ANYTOKEN = 299
+     ANYTOKEN = 299,
+     FILENAME = 300
    };
 #endif
 /* Tokens.  */
@@ -153,6 +154,7 @@
 #define OP 297
 #define IDENTIFIER 298
 #define ANYTOKEN 299
+#define FILENAME 300
 
 
 
@@ -200,7 +202,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 204 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
+#line 206 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
 
 #ifdef short
 # undef short
@@ -418,7 +420,7 @@ union yyalloc
 #define YYLAST   70
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  45
+#define YYNTOKENS  46
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  21
 /* YYNRULES -- Number of rules.  */
@@ -428,7 +430,7 @@ union yyalloc
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   299
+#define YYMAXUTOK   300
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -465,7 +467,8 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45
 };
 
 #if YYDEBUG
@@ -483,20 +486,20 @@ static const yytype_uint8 yyprhs[] =
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      46,     0,    -1,    47,    30,    -1,    54,    -1,    35,    -1,
-      37,    -1,    48,    -1,    49,    -1,    36,    -1,    -1,    50,
-      -1,    51,    -1,    52,    -1,    53,    -1,    55,    -1,    56,
-      -1,    57,    -1,     3,     5,    43,    27,    58,    28,    -1,
+      47,     0,    -1,    48,    30,    -1,    55,    -1,    35,    -1,
+      37,    -1,    49,    -1,    50,    -1,    36,    -1,    -1,    51,
+      -1,    52,    -1,    53,    -1,    54,    -1,    56,    -1,    57,
+      -1,    58,    -1,     3,     5,    43,    27,    59,    28,    -1,
        4,     5,    43,    -1,     3,     6,    43,    34,    43,    27,
-      43,    28,    -1,     4,     6,    43,    -1,    38,    43,    30,
-      -1,     7,    29,     8,    43,    62,    -1,    11,    12,    43,
-      13,    27,    60,    28,    -1,    14,     8,    43,    62,    -1,
-      58,    26,    59,    -1,    58,    26,    32,    33,    27,    43,
-      28,    -1,    59,    -1,    43,    23,    27,    40,    28,    65,
-      -1,    43,    21,    65,    -1,    43,    22,    65,    -1,    60,
-      26,    61,    -1,    61,    -1,    44,    -1,    39,    -1,    40,
-      -1,    41,    -1,     9,    63,    -1,    -1,    64,    -1,    63,
-      10,    64,    -1,    43,    42,    61,    -1,    31,    -1,    -1
+      43,    28,    -1,     4,     6,    43,    -1,    38,    45,    30,
+      -1,     7,    29,     8,    43,    63,    -1,    11,    12,    43,
+      13,    27,    61,    28,    -1,    14,     8,    43,    63,    -1,
+      59,    26,    60,    -1,    59,    26,    32,    33,    27,    43,
+      28,    -1,    60,    -1,    43,    23,    27,    40,    28,    66,
+      -1,    43,    21,    66,    -1,    43,    22,    66,    -1,    61,
+      26,    62,    -1,    62,    -1,    44,    -1,    39,    -1,    40,
+      -1,    41,    -1,     9,    64,    -1,    -1,    65,    -1,    64,
+      10,    65,    -1,    43,    42,    62,    -1,    31,    -1,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
@@ -522,10 +525,10 @@ static const char *const yytname[] =
   "T_COMMA", "T_LEFT_BRACKET", "T_RIGHT_BRACKET", "T_STAR", "T_SEMICOLON",
   "T_UNIQUE", "T_PRIMARY", "T_KEY", "T_ON", "T_EOF", "T_EXIT", "T_ABORT",
   "T_EXECFILE", "P_INT", "NUM", "P_FLOAT", "OP", "IDENTIFIER", "ANYTOKEN",
-  "$accept", "start", "command", "ddl", "dml", "createTable", "dropTable",
-  "createIndex", "dropIndex", "execFile", "select", "insert", "delete",
-  "attrList", "attrCat", "valueList", "value", "whereClause", "condList",
-  "cond", "property", 0
+  "FILENAME", "$accept", "start", "command", "ddl", "dml", "createTable",
+  "dropTable", "createIndex", "dropIndex", "execFile", "select", "insert",
+  "delete", "attrList", "attrCat", "valueList", "value", "whereClause",
+  "condList", "cond", "property", 0
 };
 #endif
 
@@ -538,18 +541,18 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299
+     295,   296,   297,   298,   299,   300
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    45,    46,    46,    46,    46,    47,    47,    47,    47,
-      48,    48,    48,    48,    49,    49,    49,    50,    51,    52,
-      53,    54,    55,    56,    57,    58,    58,    58,    59,    59,
-      59,    60,    60,    61,    61,    61,    61,    62,    62,    63,
-      63,    64,    65,    65
+       0,    46,    47,    47,    47,    47,    48,    48,    48,    48,
+      49,    49,    49,    49,    50,    50,    50,    51,    52,    53,
+      54,    55,    56,    57,    58,    59,    59,    59,    60,    60,
+      60,    61,    61,    62,    62,    62,    62,    63,    63,    64,
+      64,    65,    66,    66
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -591,7 +594,7 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -62
 static const yytype_int8 yypact[] =
 {
-      -3,    14,    20,   -20,    15,     5,   -62,   -62,   -62,   -15,
+      -3,    14,    20,   -20,    15,     5,   -62,   -62,   -62,   -17,
       29,     6,   -62,   -62,   -62,   -62,   -62,   -62,   -62,   -62,
      -62,   -62,   -12,    -6,    -5,    -4,    32,    -2,    -1,    13,
      -62,   -62,    17,    11,   -62,   -62,     3,    34,    39,   -62,
@@ -631,7 +634,7 @@ static const yytype_int8 yycheck[] =
 {
        3,     4,    56,    32,     7,    26,    67,    28,    11,    29,
       26,    14,    28,     8,    43,    76,    39,    40,    41,     5,
-       6,    44,    21,    22,    23,     5,     6,    12,    43,     0,
+       6,    44,    21,    22,    23,     5,     6,    12,    45,     0,
       84,    43,    35,    36,    37,    38,    30,    43,    43,    43,
        8,    43,    43,    30,    27,    34,    43,    13,     9,    27,
       43,    43,    43,    27,    42,    10,    31,    27,    40,    43,
@@ -644,14 +647,14 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     3,     4,     7,    11,    14,    35,    36,    37,    38,
-      46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-      56,    57,     5,     6,     5,     6,    29,    12,     8,    43,
+      47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,    58,     5,     6,     5,     6,    29,    12,     8,    45,
        0,    30,    43,    43,    43,    43,     8,    43,    43,    30,
-      27,    34,    43,    13,     9,    62,    43,    58,    59,    43,
-      62,    27,    43,    63,    64,    21,    22,    23,    26,    28,
-      27,    39,    40,    41,    44,    60,    61,    42,    10,    31,
-      65,    65,    27,    32,    59,    43,    26,    28,    61,    64,
-      40,    33,    28,    61,    28,    27,    65,    43,    28
+      27,    34,    43,    13,     9,    63,    43,    59,    60,    43,
+      63,    27,    43,    64,    65,    21,    22,    23,    26,    28,
+      27,    39,    40,    41,    44,    61,    62,    42,    10,    31,
+      66,    66,    27,    32,    60,    43,    26,    28,    62,    65,
+      40,    33,    28,    62,    28,    27,    66,    43,    28
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1738,7 +1741,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1742 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
+#line 1745 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

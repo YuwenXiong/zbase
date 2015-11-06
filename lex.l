@@ -22,7 +22,7 @@ identifier  {nondigit}({nondigit}|{digit})*
 single_quote '
 double_quote \"
 token       ({int}{identifier})|{identifier}
-
+filename    {identifier}\.{identifier}
 
 %%
 
@@ -55,6 +55,11 @@ token       ({int}{identifier})|{identifier}
 
 {identifier} {
     return checkToken(yytext);
+}
+
+{filename} {
+    yylval.sval = yytext;
+    return FILENAME;
 }
 
 "<" {

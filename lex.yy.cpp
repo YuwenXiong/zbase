@@ -361,8 +361,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 21
-#define YY_END_OF_BUFFER 22
+#define YY_NUM_RULES 22
+#define YY_END_OF_BUFFER 23
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -370,12 +370,12 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[37] =
+static yyconst flex_int16_t yy_accept[40] =
     {   0,
-        0,    0,   22,   20,    1,    1,   20,   20,   20,   15,
-       16,   18,   20,   17,    3,   19,    8,   12,   10,    7,
-       13,    0,    0,    4,    5,    3,    9,   14,   11,    7,
-        2,    5,    0,    0,    6,    0
+        0,    0,   23,   21,    1,    1,   21,   21,   21,   16,
+       17,   19,   21,   18,    3,   20,    9,   13,   11,    7,
+       14,    0,    0,    4,    5,    3,   10,   15,   12,    0,
+        7,    2,    5,    8,    0,    8,    0,    6,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -416,42 +416,46 @@ static yyconst flex_int32_t yy_meta[20] =
         1,    1,    4,    1,    1,    1,    1,    4,    4
     } ;
 
-static yyconst flex_int16_t yy_base[40] =
+static yyconst flex_int16_t yy_base[43] =
     {   0,
-        0,    0,   47,   48,   48,   48,   30,    0,    0,   48,
-       48,   48,   32,   48,    8,   48,    6,   48,   28,    0,
-       48,   38,   35,   12,   23,   14,   48,   48,   48,    0,
-       48,   15,   19,   20,   18,   48,   34,   38,   26
+        0,    0,   53,   54,   54,   54,   36,    0,    0,   54,
+       54,   54,   38,   54,    8,   54,    6,   54,   34,   12,
+       54,   44,   41,   14,   29,   16,   54,   54,   54,   14,
+        0,   54,   21,    0,   25,    0,   26,   24,   54,   40,
+       44,   32
     } ;
 
-static yyconst flex_int16_t yy_def[40] =
+static yyconst flex_int16_t yy_def[43] =
     {   0,
-       36,    1,   36,   36,   36,   36,   36,   37,   38,   36,
-       36,   36,   36,   36,   36,   36,   36,   36,   36,   39,
-       36,   37,   38,   36,   36,   36,   36,   36,   36,   39,
-       36,   36,   36,   36,   36,    0,   36,   36,   36
+       39,    1,   39,   39,   39,   39,   39,   40,   41,   39,
+       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
+       39,   40,   41,   39,   39,   39,   39,   39,   39,   39,
+       20,   39,   39,   42,   39,   42,   39,   39,    0,   39,
+       39,   39
     } ;
 
-static yyconst flex_int16_t yy_nxt[68] =
+static yyconst flex_int16_t yy_nxt[74] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
        14,    4,   15,   16,   17,   18,   19,   20,   20,   25,
-       26,   27,   28,   25,   24,   25,   26,   32,   34,   30,
-       35,   35,   35,   33,   22,   32,   22,   22,   23,   23,
-       31,   23,   31,   29,   24,   21,   36,    3,   36,   36,
-       36,   36,   36,   36,   36,   36,   36,   36,   36,   36,
-       36,   36,   36,   36,   36,   36,   36
+       26,   27,   28,   30,   31,   25,   24,   25,   26,   31,
+       31,   34,   34,   33,   37,   36,   38,   38,   38,   35,
+       22,   33,   22,   22,   23,   23,   32,   23,   32,   29,
+       24,   21,   39,    3,   39,   39,   39,   39,   39,   39,
+       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
+       39,   39,   39
     } ;
 
-static yyconst flex_int16_t yy_chk[68] =
+static yyconst flex_int16_t yy_chk[74] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,   15,
-       15,   17,   17,   24,   24,   26,   26,   32,   33,   39,
-       35,   33,   34,   32,   37,   25,   37,   37,   38,   38,
-       23,   38,   22,   19,   13,    7,    3,   36,   36,   36,
-       36,   36,   36,   36,   36,   36,   36,   36,   36,   36,
-       36,   36,   36,   36,   36,   36,   36
+       15,   17,   17,   20,   20,   24,   24,   26,   26,   20,
+       20,   30,   30,   33,   35,   42,   38,   35,   37,   33,
+       40,   25,   40,   40,   41,   41,   23,   41,   22,   19,
+       13,    7,    3,   39,   39,   39,   39,   39,   39,   39,
+       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
+       39,   39,   39
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -478,7 +482,7 @@ char *yytext;
     #include <vector>
     using namespace std;
     int checkToken(string s);
-#line 482 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 486 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 #define INITIAL 0
 
@@ -663,7 +667,7 @@ YY_DECL
 #line 27 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 
 
-#line 667 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 671 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -716,13 +720,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 37 )
+				if ( yy_current_state >= 40 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 48 );
+		while ( yy_base[yy_current_state] != 54 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -804,15 +808,15 @@ case 8:
 YY_RULE_SETUP
 #line 60 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = LT;
-    return OP;
+    yylval.sval = yytext;
+    return FILENAME;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 64 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 65 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = LE;
+    yylval.cval = LT;
     return OP;
 }
 	YY_BREAK
@@ -820,7 +824,7 @@ case 10:
 YY_RULE_SETUP
 #line 69 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = GT;
+    yylval.cval = LE;
     return OP;
 }
 	YY_BREAK
@@ -828,7 +832,7 @@ case 11:
 YY_RULE_SETUP
 #line 74 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = GE;
+    yylval.cval = GT;
     return OP;
 }
 	YY_BREAK
@@ -836,7 +840,7 @@ case 12:
 YY_RULE_SETUP
 #line 79 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = EQ;
+    yylval.cval = GE;
     return OP;
 }
 	YY_BREAK
@@ -844,7 +848,7 @@ case 13:
 YY_RULE_SETUP
 #line 84 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    yylval.cval = NE;
+    yylval.cval = EQ;
     return OP;
 }
 	YY_BREAK
@@ -858,59 +862,67 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 95 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 94 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    return T_LEFT_BRACKET;
+    yylval.cval = NE;
+    return OP;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 99 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 100 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    return T_RIGHT_BRACKET;
+    return T_LEFT_BRACKET;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 103 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 104 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    return T_COMMA;
+    return T_RIGHT_BRACKET;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 107 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 108 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    return T_STAR;
+    return T_COMMA;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 111 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 112 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
-    return T_SEMICOLON;
+    return T_STAR;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 115 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 116 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+{
+    return T_SEMICOLON;
+}
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 120 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     printf("yytext: %s, command error!", yytext);
     return T_ABORT;
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 120 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 125 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_EOF;
 }
 	YY_BREAK
-case 21:
+case 22:
 YY_RULE_SETUP
-#line 127 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 132 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 ECHO;
 	YY_BREAK
-#line 914 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 926 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1200,7 +1212,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 37 )
+			if ( yy_current_state >= 40 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1228,11 +1240,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 37 )
+		if ( yy_current_state >= 40 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 36);
+	yy_is_jam = (yy_current_state == 39);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1905,7 +1917,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 127 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 132 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 
 
 

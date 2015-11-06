@@ -80,7 +80,8 @@
      P_FLOAT = 296,
      OP = 297,
      IDENTIFIER = 298,
-     ANYTOKEN = 299
+     ANYTOKEN = 299,
+     FILENAME = 300
    };
 #endif
 /* Tokens.  */
@@ -126,6 +127,7 @@
 #define OP 297
 #define IDENTIFIER 298
 #define ANYTOKEN 299
+#define FILENAME 300
 
 
 

@@ -370,7 +370,8 @@ bool QL_Manager::checkUnique(const string &relationName, AttrCatRecord attr, Val
     char* recordData = new char[tupleLength];
     if ((rc = scanHandle->Open())) {
         delete[] recordData;
-        if (rc != RM_SCAN_EMPTY_RECORD) {
+        if (rc != RM_SCAN_EMPTY_RECORD && rc != IX_NO_SCAN_RESULT) {
+            printf("%d\n", rc);
             assert(0);
         }
         return true;

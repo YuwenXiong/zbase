@@ -50,7 +50,7 @@ extern void yyerror(const char *);
 %token<ival> P_INT NUM
 %token<fval> P_FLOAT
 %token<cval> OP
-%token<sval> IDENTIFIER ANYTOKEN
+%token<sval> IDENTIFIER ANYTOKEN FILENAME
 %type<pval> property
 %type<tval>
     start
@@ -137,7 +137,7 @@ dropIndex
     };
 
 execFile
-    : T_EXECFILE IDENTIFIER T_SEMICOLON {
+    : T_EXECFILE FILENAME T_SEMICOLON {
         $$.type = EMPTY;
         FILE *fp = fopen($2.c_str(), "r");
         if (fp == NULL) {
