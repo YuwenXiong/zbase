@@ -43,11 +43,14 @@ int main() {
 
     if((rc = smm.CreateTable("Student", attrs1)) != 0)
         return rc;
-    if((rc = smm.CreateTable("Teacher", attrs2)) != 0)
+//    if((rc = smm.CreateTable("Teacher", attrs2)) != 0)
+//        return rc;
+
+    if((rc = smm.CreateIndex("Student", "ID", "StuIndex")))
         return rc;
 
-//    if((rc = smm.DropTable("Student")))
-//        return rc;
+    if((rc = smm.DropTable("Student")))
+        return rc;
 //
 //    rc = smm.GetAttrInfo("Student", 2, attrRecords1);
 //    if(rc == SM_NOTFOUND)
@@ -64,8 +67,7 @@ int main() {
 //    print(attrRecords1);
 //    print(attrRecords2);
 
-    if((rc = smm.CreateIndex("Student", "ID", "StuIndex")))
-        return rc;
+
 
 //    for(int i = 0; i < 10; i++) {
 //        value.type = INT;
@@ -78,8 +80,8 @@ int main() {
 //            return rc;
 //    }
 //
-    if((rc = smm.DropIndex("StuIndex")))
-        return rc;
+//    if((rc = smm.DropIndex("StuIndex")))
+//        return rc;
 //
 //    smm.GetAttrInfo("Student", "ID", attrData);
 //    cout << attrData.indexNo << endl;

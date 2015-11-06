@@ -144,12 +144,12 @@ RC SM_Manager::DropTable(const string &relationName) {
 		if(relationName == ((AttrCatRecordC *)data)->relationName) {
 			if(((AttrCatRecordC *)data)->indexNo != -1) {
 				map<string, string> m;
-				auto it = m.begin();
 				string s1 = ((AttrCatRecordC *)data)->relationName;
 				string s2 = ((AttrCatRecordC *)data)->attrName;
 				string s = s1 + "," + s2;
 
 				mapGet(m);
+				auto it = m.begin();
 				for( ; it != m.end(); it++) {
 					if(it->second == s)
 						break;
