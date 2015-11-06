@@ -49,6 +49,13 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 	RelationCatRecord relRecord;
 	AttrCatRecord attrRecord;
 
+	FILE *fp = NULL;
+
+	if((fp = fopen(relationName, "r")) != NULL) {
+		fclose(fp);
+		return SM_TABLEEXISTS;
+	}
+
 	for(int i = 0; i < attrs.size(); i++) {
 		attrRecord.relationName = relationName;
 		attrRecord.attrName = attrs[i].attrName;
@@ -74,6 +81,13 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 	if((rc = relfh.InsertRecord((char *) &temp, rid)) != 0)
 		return rc;
 
+	for(int i = 0; i < attrs.size(); i++) {
+		if(attrs[i].property == PRIMARY) {
+			string temp = relationName + "PRIMARY";
+			CreateIndex(relationName, attrs[i].attrName, temp);
+		}
+	}
+
 	return 0;
 }
 
@@ -90,7 +104,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 	value.strData = relationName;
 
 	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
@@ -118,7 +132,7 @@ RC SM_Manager::DropTable(const string &relationName) {
 		return rc;
 
 	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
@@ -155,10 +169,16 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	Value value, data;
 	map<string, string> m;
 
+	mapGet(m);
+	if(m.find(indexName) == m.end())
+		return SM_INDEXNAMEEXISTS;
+
 	if((rc = GetAttrInfo(relationName, attrName, attrRecord, rid)) != 0)
 		return rc;
 	if(attrRecord.indexNo != -1)
 		return SM_INDEXEXISTS;
+	if(attrRecord.property != UNIQUE)
+		return SM_NOTUNIQUE;
 	if((rc = attrfh.GetRecord(rid, rec)) != 0)
 		return rc;
 	rec.GetData(pdata1);
@@ -167,7 +187,6 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	if((rc = attrfh.UpdateRecord(rec)) != 0)
 		return rc;
 
-	mapGet(m);
 	s = relationName + "," + attrName;
 	m[indexName] = s;
 	mapSave(m);
@@ -318,7 +337,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 	value.strData = relationName;
 
 	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
@@ -355,7 +374,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	value.strData = attrName;
 
 	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, attrName), EQ, value)) != 0)
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
@@ -395,7 +414,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 	value.strData = attrName;
 
 	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, attrName), EQ, value)) != 0)
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
@@ -475,7 +494,7 @@ RC SM_Manager::GetRelationInfo(const string &relationName, RelationCatRecord &re
 	value.strData = relationName;
 
 	if((rc = rmfs.OpenScan(relfh, CHARN, MAXNAME, offsetof(RelationCatRecordC, relationName), EQ, value)) != 0 )
-		return rc;
+		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)

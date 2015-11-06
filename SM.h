@@ -16,7 +16,9 @@ using namespace std;
 
 const RC SM_NOTFOUND = SM_RC -1;
 const RC SM_INDEXEXISTS = SM_RC -2;
-const RC SM_TABLEEXISTS = SM_RC -3;
+const RC SM_INDEXNAMEEXISTS = SM_RC -3;
+const RC SM_NOTUNIQUE = SM_RC - 4;
+const RC SM_TABLEEXISTS = SM_RC - 5;
 
 class SM_Manager {
 private:
