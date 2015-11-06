@@ -15,7 +15,7 @@ int main(){
     IX_IndexHandle ixih;
     IX_IndexScan ixis;
 
-    if(rc=ixm.CreateIndex("indextest",0,INT,4))
+    if(rc=ixm.CreateIndex("indextest",0,FLOAT,4))
         return rc;
     if(rc=ixm.OpenIndex("indextest",0,ixih))
         return rc;

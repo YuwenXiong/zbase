@@ -163,7 +163,7 @@ RC B_Entry::SetFromSon(B_Node* nodeSon){
     son=nodeSon->header.pageNum;
     switch(b_tree->header.type){
         case INT: ikey=nodeSon->entries[0]->ikey;break;
-        case FLOAT: ikey=nodeSon->entries[0]->ikey;break;
+        case FLOAT: fkey=nodeSon->entries[0]->fkey;break;
         case CHARN: skey=nodeSon->entries[0]->skey;break;
     }
     return RC_OK;
@@ -254,7 +254,7 @@ RC B_Entry::SetFromEntry(B_Entry *b_entry) {
         return IX_SET_FROM_DIFFERENT_LEVEL;
     switch(b_tree->header.type){
         case INT: ikey=b_entry->ikey;break;
-        case FLOAT: ikey=b_entry->ikey;break;
+        case FLOAT: fkey=b_entry->fkey;break;
         case CHARN: skey=b_entry->skey;break;
     }
     if(level==0)
