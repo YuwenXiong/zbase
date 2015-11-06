@@ -352,6 +352,8 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 
 	if((rc = rmfs.OpenScan(attrfh, CHARN, MAXNAME, offsetof(AttrCatRecordC, relationName), EQ, value)) != 0)
 		return rc == RM_SCAN_EMPTY_RECORD ? SM_NOTFOUND : rc;
+	attrs.clear();
+	attrs.resize(attrCount);
 	while(true) {
 		rc = rmfs.GetNextRecord(rec);
 		if(rc == RM_EOF)
