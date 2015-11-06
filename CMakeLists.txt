@@ -23,7 +23,7 @@ set(SM_TEST_FILES IX.h IX.cpp RM.cpp RM.h SM.cpp SM.h B_Tree.cpp B_Tree.h SM_tes
 
 set(IX_TEST_FILES IX.h IX.cpp  B_Tree.cpp B_Tree.h IX_test.cpp RM.cpp RM.h)
 
-#set(RM_TEST_FILES RM.cpp RM.h RM_test.cpp)
+set(RM_TEST_FILES RM.cpp RM.h RM_test.cpp)
 
 
 #add_dependencies(yy.tab.o yy.tab.c)
@@ -32,4 +32,4 @@ add_executable(zbase ${SOURCE_FILES} ${PARSER_FILES})
 add_executable(pf_test ${PF_TEST_FILES})
 add_executable(sm_test ${SM_TEST_FILES} ${PF_TEST_FILES})
 add_executable(ix_test ${IX_TEST_FILES} ${PF_TEST_FILES})
-#add_executable(rm_test ${RM_TEST_FILES} ${PF_TEST_FILES})
+add_executable(rm_test ${RM_TEST_FILES} ${PF_TEST_FILES})
