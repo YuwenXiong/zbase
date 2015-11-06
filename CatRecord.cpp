@@ -24,6 +24,7 @@ AttrCatRecord::AttrCatRecord(const AttrCatRecordC &x) {
     attrLength = x.attrLength;
     indexNo = x.indexNo;
     property = x.property;
+    this->x = x.x;
 }
 
 AttrCatRecordC::AttrCatRecordC(const AttrCatRecord &x) {
@@ -34,4 +35,5 @@ AttrCatRecordC::AttrCatRecordC(const AttrCatRecord &x) {
     attrLength = x.attrLength;
     indexNo = x.indexNo;
     property = x.property;
+    this->x = x.x;
 }

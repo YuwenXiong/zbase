@@ -81,6 +81,7 @@ struct AttrCatRecord {
     size_t attrLength;
     int indexNo;
     Property property;
+    int x;
     AttrCatRecord();
     AttrCatRecord(const AttrCatRecordC &x);
 };
@@ -93,6 +94,7 @@ struct AttrCatRecordC {
     size_t attrLength;
     int indexNo;
     Property property;
+    int x;
     AttrCatRecordC(const AttrCatRecord &x);
 };
 

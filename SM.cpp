@@ -64,6 +64,7 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 		attrRecord.attrLength = attrs[i].attrLength;
 		attrRecord.property = attrs[i].property;
 		attrRecord.indexNo = -1;
+		attrRecord.x = i;
 		AttrCatRecordC temp(attrRecord);
 		if((rc = attrfh.InsertRecord((char*)&temp, rid)) != 0)
 			return rc;
@@ -363,7 +364,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, int attrCount, vector<Att
 			isFound = true;
 			AttrCatRecordC temp(attrData);
 			memcpy(&temp, data, sizeof(AttrCatRecordC));
-			attrs.push_back(AttrCatRecord(temp));
+			attrs[temp.x] = (AttrCatRecord(temp));
 		}
 	}
 	if((rc = rmfs.CloseScan()) != 0)
