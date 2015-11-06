@@ -63,6 +63,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
     lastHandle = scanHandle;
     vector<shared_ptr<QL_ScanHandle>> filterHandle(changedCondition.size());
     for (int i = 0; i < changedCondition.size(); i++) {
+        changedCondition[i].lAttr.relationName = relation;
         filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i], relation));
         lastHandle = filterHandle[i];
     }
@@ -84,7 +85,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
     return RC_OK;
 }
 
-RC QL_Manager::Insert(const string &relation, vector<Value> values) {
+RC QL_Manager::Insert(const string &relation, const vector<Value> &values) {
     RC rc;
     RelationCatRecord rcRecord;
 
@@ -185,9 +186,14 @@ RC QL_Manager::Insert(const string &relation, vector<Value> values) {
     return RC_OK;
 }
 
-RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions) {
+RC QL_Manager::Delete(const string &relation, vector<Condition> &conditions) {
     RC rc;
     RelationCatRecord rcRecord;
+
+    for (int i = 0; i < conditions.size(); i++) {
+        conditions[i].lAttr.relationName = relation;
+    }
+
     if ((rc = smManager->GetRelationInfo(relation, rcRecord))) {
         return rc;
     }
@@ -251,7 +257,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
         }
     }
 
-    while (scanHandle->GetNext(rid) != EOF) {
+    while (scanHandle->GetNext(rid) != QL_EOF) {
         if ((rc = rmFH.GetRecord(rid, record)) || (rc = record.GetData(recordData))) {
             return rc;
         }

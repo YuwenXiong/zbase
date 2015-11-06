@@ -27,8 +27,8 @@ public:
     QL_Manager(SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm);
     ~QL_Manager();
     RC Select(vector<AttrInfo> &selectAttrs, const string &relations, const vector<Condition> &conditions);
-    RC Insert(const string &relation, const vector<Value> values);
-    RC Delete(const string &relation, const vector<Condition> conditions);
+    RC Insert(const string &relation, const vector<Value> &values);
+    RC Delete(const string &relation, vector<Condition> &conditions);
 private:
 
     bool checkUnique(const string &relationName, AttrCatRecord attr, Value value, size_t tupleLength);

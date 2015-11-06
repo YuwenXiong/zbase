@@ -2,7 +2,7 @@
 #include "zbase.h"
 #include <sstream>
 using namespace std;
-RC IX_IndexHandle::InsertEntry(Value &data, const RID &rid){
+RC IX_IndexHandle::InsertEntry(const Value &data, const RID &rid){
     AttrType type=b_tree.header.type;
     B_Entry* newEntry=new B_Entry;
     newEntry->Init(&b_tree,0);
