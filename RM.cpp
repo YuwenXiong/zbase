@@ -189,6 +189,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
     SlotNum slotNumF,slotNumL;
     headerChanged=true;
     bool insertAtTail=false;
+    int flag = 0;
     if(header.firstFreeSlot.GetPageNum(pageNumF)==RM_NULL_PAGE){
         if((rc=pffh.AllocatePage(pfph)))
             return rc;
@@ -196,15 +197,18 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
         slotNumF=0;
         header.lastFreeSlot=RID(0,1);
         insertAtTail = true;
+        flag = 1;
     }
     else {
         header.firstFreeSlot.GetSlotNum(slotNumF);
         if (slotNumF==header.slotPerPage){
             if((rc=pffh.AllocatePage(pfph)))
                 return rc;
+            insertAtTail=true;
             pageNumF++;
             slotNumF=0;
             header.lastFreeSlot=RID(pageNumF,slotNumF+1);
+            flag = 2;
         }
         else{
             if((rc=pffh.GetThisPage(pageNumF,pfph)))
@@ -213,6 +217,7 @@ RC RM_FileHandle::InsertRecord(const char *data, RID &rid){
                 insertAtTail=true;
                 header.lastFreeSlot=RID(pageNumF,slotNumF+1);
             }
+            flag = 3;
         }
     }
     if(!insertAtTail)

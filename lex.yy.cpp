@@ -482,7 +482,8 @@ char *yytext;
     #include <vector>
     using namespace std;
     int checkToken(string s);
-#line 486 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+    extern int fflag;
+#line 487 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 #define INITIAL 0
 
@@ -664,10 +665,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 27 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 28 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 
 
-#line 671 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 672 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -753,13 +754,13 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 29 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 30 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 31 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 32 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.sval = yytext;
     return ANYTOKEN;
@@ -767,7 +768,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 36 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 37 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     sscanf(yytext, "%d", &yylval.ival);
     return NUM;
@@ -775,7 +776,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 41 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 42 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     sscanf(yytext, "%d", &yylval.ival);
     return P_INT;
@@ -783,7 +784,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 46 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 47 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     sscanf(yytext, "%f", &yylval.fval);
     return P_FLOAT;
@@ -791,7 +792,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 51 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 52 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     sscanf(yytext, "%f", &yylval.fval);
     return P_FLOAT;
@@ -799,14 +800,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 56 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 57 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return checkToken(yytext);
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 60 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 61 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.sval = yytext;
     return FILENAME;
@@ -814,7 +815,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 65 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 66 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = LT;
     return OP;
@@ -822,7 +823,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 69 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 70 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = LE;
     return OP;
@@ -830,7 +831,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 74 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 75 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = GT;
     return OP;
@@ -838,7 +839,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 79 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 80 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = GE;
     return OP;
@@ -846,7 +847,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 84 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 85 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = EQ;
     return OP;
@@ -854,7 +855,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 89 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 90 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = NE;
     return OP;
@@ -862,7 +863,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 94 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 95 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     yylval.cval = NE;
     return OP;
@@ -870,59 +871,59 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 100 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 101 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_LEFT_BRACKET;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 104 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 105 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_RIGHT_BRACKET;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 108 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 109 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_COMMA;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 112 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 113 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_STAR;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 116 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 117 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_SEMICOLON;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 120 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 121 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     printf("yytext: %s, command error!", yytext);
     return T_ABORT;
 }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 125 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 126 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 {
     return T_EOF;
 }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 132 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 133 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 ECHO;
 	YY_BREAK
-#line 926 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
+#line 927 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.yy.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1917,7 +1918,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 132 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
+#line 133 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/lex.l"
 
 
 
@@ -1987,6 +1988,7 @@ void yyerror(char const *s) {
 int yywrap(void)
 {
    yyin = stdin;
+   fflag = 0;
    return 0;
 }
 

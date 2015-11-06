@@ -7,6 +7,7 @@
     #include <vector>
     using namespace std;
     int checkToken(string s);
+    extern int fflag;
 %}
 
 anytoken    ({single_quote}([^\'])+{single_quote})|{double_quote}([^\"])+{double_quote}
@@ -197,5 +198,6 @@ void yyerror(char const *s) {
 int yywrap(void)
 {
    yyin = stdin;
+   fflag = 0;
    return 0;
 }

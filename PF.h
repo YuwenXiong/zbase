@@ -27,7 +27,7 @@ const size_t PF_PAGE_SIZE = 4096 - sizeof(PF_PageHeader);
 const size_t PF_FILE_HEADER_SIZE = PF_PAGE_SIZE + sizeof(PF_PageHeader);
 
 // bufferSize is the number of pages in buffer
-const int PF_BUFFER_SIZE = 40;
+const int PF_BUFFER_SIZE = 40000;
 // hashTableSize is the size of hash table;
 const int PF_HASH_TABLE_SIZE = 20;
 

@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <iomanip>
 #include "QL.h"
 
 Printer::Printer(vector<AttrCatRecord> _attrs):attrs(_attrs) {
@@ -12,15 +13,15 @@ void Printer::Print(const char *recordData) {
     for (auto x:attrs) {
         switch (x.attrType) {
             case INT: {
-                cout << *(int *)(recordData + x.offset) << ' ';
+                cout << setw(12) << *(int *)(recordData + x.offset);
                 break;
             }
             case FLOAT: {
-                cout << *(float *)(recordData + x.offset) << ' ';
+                cout << setw(12) << *(float *)(recordData + x.offset);
                 break;
             }
             case CHARN: {
-                cout << string(recordData + x.offset) << ' ';
+                cout << setw(12) << string(recordData + x.offset);
                 break;
             }
             default:

@@ -5,7 +5,7 @@
 extern State parseState;
 extern FILE* yyin;
 extern void yyerror(const char *);
-
+extern int fflag;
 %}
 
 
@@ -138,12 +138,13 @@ dropIndex
 
 execFile
     : T_EXECFILE FILENAME T_SEMICOLON {
-        $$.type = EMPTY;
+        parseState.type = EMPTY;
         FILE *fp = fopen($2.c_str(), "r");
         if (fp == NULL) {
             printf("Open file error!\n");
         } else {
             yyin = fp;
+            fflag = 1;
         }
         YYACCEPT;
     }

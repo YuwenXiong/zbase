@@ -168,7 +168,7 @@
 extern State parseState;
 extern FILE* yyin;
 extern void yyerror(const char *);
-
+extern int fflag;
 
 
 /* Enabling traces.  */
@@ -507,9 +507,9 @@ static const yytype_uint16 yyrline[] =
 {
        0,    78,    78,    82,    83,    87,    92,    93,    94,    97,
      102,   103,   104,   105,   108,   109,   110,   113,   120,   126,
-     134,   140,   152,   160,   168,   176,   180,   189,   194,   202,
-     205,   210,   214,   219,   224,   229,   234,   241,   244,   249,
-     252,   258,   264,   267
+     134,   140,   153,   161,   169,   177,   181,   190,   195,   203,
+     206,   211,   215,   220,   225,   230,   235,   242,   245,   250,
+     253,   259,   265,   268
 };
 #endif
 
@@ -1543,19 +1543,20 @@ yyreduce:
   case 21:
 #line 140 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
-        (yyval.tval).type = EMPTY;
+        parseState.type = EMPTY;
         FILE *fp = fopen((yyvsp[(2) - (3)].sval).c_str(), "r");
         if (fp == NULL) {
             printf("Open file error!\n");
         } else {
             yyin = fp;
+            fflag = 1;
         }
         YYACCEPT;
     ;}
     break;
 
   case 22:
-#line 152 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 153 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).type = SELECT;
         (yyval.tval).relationName = (yyvsp[(4) - (5)].sval);
@@ -1565,7 +1566,7 @@ yyreduce:
     break;
 
   case 23:
-#line 160 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 161 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).type = INSERT;
         (yyval.tval).relationName = (yyvsp[(3) - (7)].sval);
@@ -1574,7 +1575,7 @@ yyreduce:
     break;
 
   case 24:
-#line 168 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 169 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).type = DELETE;
         (yyval.tval).relationName = (yyvsp[(3) - (4)].sval);
@@ -1584,7 +1585,7 @@ yyreduce:
     break;
 
   case 25:
-#line 176 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 177 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval) = (yyvsp[(1) - (3)].tval);
         (yyval.tval).attrs.push_back((yyvsp[(3) - (3)].tval).attrs[0]);
@@ -1592,7 +1593,7 @@ yyreduce:
     break;
 
   case 26:
-#line 180 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 181 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval) = (yyvsp[(1) - (7)].tval);
         for (auto &x: (yyval.tval).attrs) {
@@ -1605,14 +1606,14 @@ yyreduce:
     break;
 
   case 27:
-#line 189 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 190 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval) = (yyvsp[(1) - (1)].tval);
     ;}
     break;
 
   case 28:
-#line 194 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 195 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         if ((yyvsp[(4) - (6)].ival) >= 1 && (yyvsp[(4) - (6)].ival) <= 255) {
             (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (6)].sval), CHARN, (yyvsp[(4) - (6)].ival), (yyvsp[(6) - (6)].pval)));
@@ -1624,21 +1625,21 @@ yyreduce:
     break;
 
   case 29:
-#line 202 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 203 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (3)].sval), INT, sizeof(int), (yyvsp[(3) - (3)].pval)));
     ;}
     break;
 
   case 30:
-#line 205 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 206 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (3)].sval), FLOAT, sizeof(float), (yyvsp[(3) - (3)].pval)));
     ;}
     break;
 
   case 31:
-#line 210 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 211 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values = (yyvsp[(1) - (3)].tval).values;
         (yyval.tval).values.push_back((yyvsp[(3) - (3)].tval).values[0]);
@@ -1646,14 +1647,14 @@ yyreduce:
     break;
 
   case 32:
-#line 214 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 215 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval) = (yyvsp[(1) - (1)].tval);
     ;}
     break;
 
   case 33:
-#line 219 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 220 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].sval).substr(1, (yyvsp[(1) - (1)].sval).length() - 2)));
@@ -1662,7 +1663,7 @@ yyreduce:
     break;
 
   case 34:
-#line 224 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 225 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].ival)));
@@ -1671,7 +1672,7 @@ yyreduce:
     break;
 
   case 35:
-#line 229 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 230 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].ival)));
@@ -1680,7 +1681,7 @@ yyreduce:
     break;
 
   case 36:
-#line 234 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 235 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].fval)));
@@ -1689,28 +1690,28 @@ yyreduce:
     break;
 
   case 37:
-#line 241 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 242 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(2) - (2)].tval).conditions;
     ;}
     break;
 
   case 38:
-#line 244 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 245 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     { // epsilon
         (yyval.tval).type = EMPTY;
     ;}
     break;
 
   case 39:
-#line 249 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 250 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(1) - (1)].tval).conditions;
     ;}
     break;
 
   case 40:
-#line 252 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 253 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(1) - (3)].tval).conditions;
         (yyval.tval).conditions.push_back((yyvsp[(3) - (3)].tval).conditions[0]);
@@ -1718,7 +1719,7 @@ yyreduce:
     break;
 
   case 41:
-#line 258 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 259 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions.clear();
         (yyval.tval).conditions.push_back(Condition((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].cval), (yyvsp[(3) - (3)].tval).values[0]));
@@ -1726,14 +1727,14 @@ yyreduce:
     break;
 
   case 42:
-#line 264 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 265 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.pval) = UNIQUE
     ;}
     break;
 
   case 43:
-#line 267 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 268 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.pval) = NONE;
     ;}
@@ -1741,7 +1742,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1745 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
+#line 1746 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1955,7 +1956,7 @@ yyreturn:
 }
 
 
-#line 272 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 273 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
 
 
 

@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <iomanip>
 #include "QL.h"
 #include "SM.h"
 #include "QL_Scan.h"
@@ -30,6 +31,10 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
     if ((rc = smManager->GetAttrInfo(relation, attrCount, attrs))) {
         return rc;
     }
+    for (auto &x: attrs) {
+        cout<< setw(12)  << x.attrName;
+    }
+    cout << endl;
 
     if ((rc = ValidateConditions(attrs, conditions))) {
         return rc;
@@ -51,6 +56,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
             scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relation, (i->lAttr).attrName, i->op, i->rValue));
             i = changedCondition.erase(i);
             useIndex = true;
+            break;
         } else {
             i++;
         }
@@ -70,12 +76,11 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
 //    shared_ptr<QL_ScanHandle> rootHandle;
 //    rootHandle.reset(new QL_RootHandle(smManager, lastHandle));
 
-
     Printer printer(attrs);
     char* recordData = new char[rcRecord.tupleLength];
     if ((rc = lastHandle->Open())) {
         delete[] recordData;
-        return rc == RM_SCAN_EMPTY_RECORD ? RC_OK : rc;
+        return (rc == RM_SCAN_EMPTY_RECORD || rc == IX_NO_SCAN_RESULT) ? RC_OK : rc;
     }
     while (lastHandle->GetNext(recordData) != QL_EOF) {
         printer.Print(recordData);
@@ -129,8 +134,8 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> &values) {
                 if((rc = ixManager->OpenIndex(relation, attrs[i].indexNo, ixIH[now]))) {
                     return rc;
                 }
+                now++;
             }
-            now++;
         }
     }
 
@@ -155,7 +160,9 @@ RC QL_Manager::Insert(const string &relation, const vector<Value> &values) {
                 assert(0);
         }
     }
-
+    if (values[4].strData == "LHUN3O") {
+        cout << values[4].strData;
+    }
     if ((rc = rmFH.InsertRecord(tupleData, rid))) {
         return rc;
     }
@@ -245,7 +252,7 @@ RC QL_Manager::Delete(const string &relation, vector<Condition> &conditions) {
     }
 
     if ((rc = scanHandle->Open())) {
-        return rc == RM_SCAN_EMPTY_RECORD ? RC_OK : rc;
+        return (rc == RM_SCAN_EMPTY_RECORD || rc == IX_NO_SCAN_RESULT) ? RC_OK : rc;
     }
 
     IX_IndexHandle* ixIH = new IX_IndexHandle[rcRecord.attrCount];
