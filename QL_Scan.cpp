@@ -185,45 +185,45 @@ RC QL_FileScanHandle::GetNext(RID &rid) {
 //    attrs = this->attrs;
 //}
 
-QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child) {
-    smManager = smm;
-    child = _child;
-//    RelationCatRecord rcRecord;
-//    smManager->GetRelationInfo(relationName, rcRecord);
-//    tupleLength = rcRecord.tupleLength;
-}
-
-QL_RootHandle::~QL_RootHandle() { }
-
-RC QL_RootHandle::Open() {
-    RC rc;
-    if ((rc = child->Open())) {
-        return rc;
-    }
-    return RC_OK;
-}
-
-RC QL_RootHandle::Close() {
-    RC rc;
-    if ((rc = child->Close())) {
-        return rc;
-    }
-    return RC_OK;
-}
-
-RC QL_RootHandle::GetNext(char *recordData) {
-    RC rc;
-//    char* data = new char[child->GetTupleLength()];
-    if ((rc = child->GetNext(recordData))) {
-        return rc;
-    }
-//    int childAttrCount = child->GetAttrCount();
-//    vector<AttrCatRecord> childAttrInfo = child->GetAttrInfo();
-//    int tupleLength = 0;
-//    for (int i = 0; i < )
-
-    return RC_OK;
-}
+//QL_RootHandle::QL_RootHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child) {
+//    smManager = smm;
+//    child = _child;
+////    RelationCatRecord rcRecord;
+////    smManager->GetRelationInfo(relationName, rcRecord);
+////    tupleLength = rcRecord.tupleLength;
+//}
+//
+//QL_RootHandle::~QL_RootHandle() { }
+//
+//RC QL_RootHandle::Open() {
+//    RC rc;
+//    if ((rc = child->Open())) {
+//        return rc;
+//    }
+//    return RC_OK;
+//}
+//
+//RC QL_RootHandle::Close() {
+//    RC rc;
+//    if ((rc = child->Close())) {
+//        return rc;
+//    }
+//    return RC_OK;
+//}
+//
+//RC QL_RootHandle::GetNext(char *recordData) {
+//    RC rc;
+////    char* data = new char[child->GetTupleLength()];
+//    if ((rc = child->GetNext(recordData))) {
+//        return rc;
+//    }
+////    int childAttrCount = child->GetAttrCount();
+////    vector<AttrCatRecord> childAttrInfo = child->GetAttrInfo();
+////    int tupleLength = 0;
+////    for (int i = 0; i < )
+//
+//    return RC_OK;
+//}
 
 
 QL_FilterHandle::QL_FilterHandle(SM_Manager *smm, shared_ptr<QL_ScanHandle> _child, Condition _filter, const string &relationName): filter(_filter) {

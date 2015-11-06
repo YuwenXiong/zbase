@@ -56,6 +56,6 @@ extern "C" {
     extern int yylex(void);
 }
 
-
+//void yyerror(const char *);
 
 #endif //ZBASE_COMMON_H

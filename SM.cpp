@@ -51,7 +51,7 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 
 	FILE *fp = NULL;
 
-	if((fp = fopen(relationName, "r")) != NULL) {
+	if((fp = fopen(relationName.c_str(), "r")) != NULL) {
 		fclose(fp);
 		return SM_TABLEEXISTS;
 	}
@@ -170,7 +170,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 	map<string, string> m;
 
 	mapGet(m);
-	if(m.find(indexName) == m.end())
+	if(m.find(indexName) != m.end())
 		return SM_INDEXNAMEEXISTS;
 
 	if((rc = GetAttrInfo(relationName, attrName, attrRecord, rid)) != 0)

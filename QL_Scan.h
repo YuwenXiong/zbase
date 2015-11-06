@@ -84,20 +84,19 @@ private:
 
 };
 
-class QL_RootHandle: public QL_ScanHandle {
-public:
-    QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child);
-    ~QL_RootHandle();
-
-    RC Open();
-    RC Close();
-    RC GetNext(char* recordData);
-
-private:
-    SM_Manager* smManager;
-    shared_ptr<QL_ScanHandle> child;
-};
-#endif //ZBASE_QL_SCAN_H
+//class QL_RootHandle: public QL_ScanHandle {
+//public:
+//    QL_RootHandle(SM_Manager* smm, shared_ptr<QL_ScanHandle> child);
+//    ~QL_RootHandle();
+//
+//    RC Open();
+//    RC Close();
+//    RC GetNext(char* recordData);
+//
+//private:
+//    SM_Manager* smManager;
+//    shared_ptr<QL_ScanHandle> child;
+//};
 
 class QL_FilterHandle: public QL_ScanHandle{
 public:
@@ -114,3 +113,5 @@ private:
     Condition filter;
     size_t tupleLength;
 };
+
+#endif //ZBASE_QL_SCAN_H

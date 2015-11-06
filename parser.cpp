@@ -30,11 +30,12 @@ void parser() {
         smm.CreateDb("ss");
     }
     smm.OpenDb("ss");
-
+    int last = 0;
     for(;;) {
         try {
-            cout << ">> ";
-            if (yyparse() == 0 && parseState.type != EMPTY) {
+//            if (last == 0)
+                cout << ">> ";
+            if ((last = yyparse()) == 0 && parseState.type != EMPTY) {
                 if (parseState.type == EXIT) {
                     smm.CloseDb();
                     break;
@@ -74,6 +75,7 @@ void parser() {
                             switch (rc) {
                                 case SM_NOTFOUND: {
                                     printf("Relation '%s' not found!\n", parseState.relationName.c_str());
+                                    break;
                                 }
                                 default: {
                                     printf("%d\n", rc);
@@ -86,6 +88,18 @@ void parser() {
                             switch (rc) {
                                 case SM_INDEXEXISTS: {
                                     printf("Index on '%s' already exists!\n", parseState.attrName.c_str());
+                                    break;
+                                }
+                                case SM_NOTFOUND: {
+                                    printf("Relation '%s' not found!\n", parseState.relationName.c_str());
+                                    break;
+                                }
+                                case SM_INDEXNAMEEXISTS: {
+                                    printf("Index name '%s' already exists!\n", parseState.indexName.c_str());
+                                    break;
+                                }
+                                case SM_NOTUNIQUE: {
+                                    printf("Attribute '%s' is not unique!\n", parseState.attrName.c_str());
                                     break;
                                 }
                                 default: {
@@ -137,6 +151,10 @@ void parser() {
                                 }
                                 case QL_INVALID_ATTR_TYPE: {
                                     printf("Invalid attribute type. Please recheck the attribute type of '%s'\n", parseState.relationName.c_str());
+                                    break;
+                                }
+                                case QL_UNIQUE_VALUE_EXISTS: {
+                                    printf("Trying to insert same value to a unique attribuate\n");
                                     break;
                                 }
                                 default: {

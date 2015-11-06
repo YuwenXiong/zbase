@@ -196,6 +196,7 @@ attrCat
             $$.attrs.push_back(AttrInfo($1, CHARN, $4, $6));
         } else {
             yyerror("Invalid string length!");
+            YYABORT;
         }
     }
     | IDENTIFIER T_INT property{

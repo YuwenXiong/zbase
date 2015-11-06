@@ -180,7 +180,7 @@ int checkToken(string s) {
 void yyerror(char const *s) {
     string t1 = s, t2 = yytext;
     char c;
-    if (t2 != ";")
+    if (t2 != ";" && strcmp(s, "syntax error") == 0)
         while(yylex() != T_SEMICOLON);
     if (strcmp(s, "Invalid string length!")) {
         printf("%s near '%s'\n", s, t2.c_str());

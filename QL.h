@@ -31,6 +31,7 @@ public:
     RC Delete(const string &relation, const vector<Condition> conditions);
 private:
 
+    bool checkUnique(const string &relationName, AttrCatRecord attr, Value value, size_t tupleLength);
     bool MatchConditions(char* recordData, const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions);
     RC ValidateConditions(const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions);
 
@@ -42,12 +43,12 @@ private:
 template<class T>
 bool matchRecord(const T &lValue, const T &rValue, CmpOp op);
 
-
 // warning
 const RC QL_INVALID_WHERE_CLAUSE = QL_RC - 1;
 const RC QL_INVALID_ATTR_COUNT = QL_RC - 2;
 const RC QL_INVALID_ATTR_TYPE = QL_RC - 3;
 const RC QL_EOF = QL_RC - 4;
+const RC QL_UNIQUE_VALUE_EXISTS = QL_RC - 5;
 
 
 #endif //ZBASE_QL_H

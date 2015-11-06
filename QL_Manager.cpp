@@ -66,17 +66,20 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
         filterHandle[i].reset(new QL_FilterHandle(smManager, lastHandle, changedCondition[i], relation));
         lastHandle = filterHandle[i];
     }
-    shared_ptr<QL_ScanHandle> rootHandle;
-    rootHandle.reset(new QL_RootHandle(smManager, lastHandle));
+//    shared_ptr<QL_ScanHandle> rootHandle;
+//    rootHandle.reset(new QL_RootHandle(smManager, lastHandle));
 
 
     Printer printer(attrs);
     char* recordData = new char[rcRecord.tupleLength];
-    rootHandle->Open();
-    while (rootHandle->GetNext(recordData) != QL_EOF) {
+    if ((rc = lastHandle->Open())) {
+        delete[] recordData;
+        return rc == RM_SCAN_EMPTY_RECORD ? RC_OK : rc;
+    }
+    while (lastHandle->GetNext(recordData) != QL_EOF) {
         printer.Print(recordData);
     }
-    rootHandle->Close();
+    lastHandle->Close();
     delete[] recordData;
     return RC_OK;
 }
@@ -104,6 +107,9 @@ RC QL_Manager::Insert(const string &relation, vector<Value> values) {
     for (int i = 0; i < values.size(); i++) {
         if (values[i].type != attrs[i].attrType) {
             return QL_INVALID_ATTR_TYPE;
+        }
+        if (attrs[i].property != NONE && !checkUnique(relation, attrs[i], values[i], rcRecord.tupleLength)) {
+            return QL_UNIQUE_VALUE_EXISTS;
         }
     }
 
@@ -233,7 +239,7 @@ RC QL_Manager::Delete(const string &relation, const vector<Condition> conditions
     }
 
     if ((rc = scanHandle->Open())) {
-        return rc;
+        return rc == RM_SCAN_EMPTY_RECORD ? RC_OK : rc;
     }
 
     IX_IndexHandle* ixIH = new IX_IndexHandle[rcRecord.attrCount];
@@ -345,6 +351,33 @@ bool matchRecord(const T &lValue, const T &rValue, CmpOp op) {
             return false;
     }
 }
+
+bool QL_Manager::checkUnique(const string &relationName, AttrCatRecord attr, Value value, size_t tupleLength) {
+    shared_ptr<QL_ScanHandle> scanHandle;
+    RC rc;
+    if (attr.indexNo != -1) {
+        scanHandle.reset(new QL_IndexScanHandle(smManager, ixManager, rmManager, relationName, attr.attrName, EQ, value));
+    } else {
+        scanHandle.reset(new QL_FileScanHandle(smManager, rmManager, relationName, attr.attrName, EQ, value));
+    }
+    bool unique = true;
+    char* recordData = new char[tupleLength];
+    if ((rc = scanHandle->Open())) {
+        delete[] recordData;
+        if (rc != RM_SCAN_EMPTY_RECORD) {
+            assert(0);
+        }
+        return true;
+    }
+    while (scanHandle->GetNext(recordData) != QL_EOF) {
+        unique = false;
+        break;
+    }
+    scanHandle->Close();
+    delete[] recordData;
+    return unique;
+}
+
 
 RC QL_Manager::ValidateConditions(const vector<AttrCatRecord> &attrs, const vector<Condition> &conditions) {
     for (int i = 0; i < conditions.size(); i++) {

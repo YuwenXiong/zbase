@@ -504,9 +504,9 @@ static const yytype_uint16 yyrline[] =
 {
        0,    78,    78,    82,    83,    87,    92,    93,    94,    97,
      102,   103,   104,   105,   108,   109,   110,   113,   120,   126,
-     134,   140,   152,   160,   168,   176,   180,   189,   194,   201,
-     204,   209,   213,   218,   223,   228,   233,   240,   243,   248,
-     251,   257,   263,   266
+     134,   140,   152,   160,   168,   176,   180,   189,   194,   202,
+     205,   210,   214,   219,   224,   229,   234,   241,   244,   249,
+     252,   258,   264,   267
 };
 #endif
 
@@ -1615,26 +1615,27 @@ yyreduce:
             (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (6)].sval), CHARN, (yyvsp[(4) - (6)].ival), (yyvsp[(6) - (6)].pval)));
         } else {
             yyerror("Invalid string length!");
+            YYABORT;
         }
     ;}
     break;
 
   case 29:
-#line 201 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 202 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (3)].sval), INT, sizeof(int), (yyvsp[(3) - (3)].pval)));
     ;}
     break;
 
   case 30:
-#line 204 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 205 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).attrs.push_back(AttrInfo((yyvsp[(1) - (3)].sval), FLOAT, sizeof(float), (yyvsp[(3) - (3)].pval)));
     ;}
     break;
 
   case 31:
-#line 209 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 210 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values = (yyvsp[(1) - (3)].tval).values;
         (yyval.tval).values.push_back((yyvsp[(3) - (3)].tval).values[0]);
@@ -1642,14 +1643,14 @@ yyreduce:
     break;
 
   case 32:
-#line 213 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 214 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval) = (yyvsp[(1) - (1)].tval);
     ;}
     break;
 
   case 33:
-#line 218 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 219 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].sval).substr(1, (yyvsp[(1) - (1)].sval).length() - 2)));
@@ -1658,7 +1659,7 @@ yyreduce:
     break;
 
   case 34:
-#line 223 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 224 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].ival)));
@@ -1667,7 +1668,7 @@ yyreduce:
     break;
 
   case 35:
-#line 228 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 229 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].ival)));
@@ -1676,7 +1677,7 @@ yyreduce:
     break;
 
   case 36:
-#line 233 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 234 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).values.clear();
         (yyval.tval).values.push_back(Value((yyvsp[(1) - (1)].fval)));
@@ -1685,28 +1686,28 @@ yyreduce:
     break;
 
   case 37:
-#line 240 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 241 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(2) - (2)].tval).conditions;
     ;}
     break;
 
   case 38:
-#line 243 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 244 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     { // epsilon
         (yyval.tval).type = EMPTY;
     ;}
     break;
 
   case 39:
-#line 248 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 249 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(1) - (1)].tval).conditions;
     ;}
     break;
 
   case 40:
-#line 251 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 252 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions = (yyvsp[(1) - (3)].tval).conditions;
         (yyval.tval).conditions.push_back((yyvsp[(3) - (3)].tval).conditions[0]);
@@ -1714,7 +1715,7 @@ yyreduce:
     break;
 
   case 41:
-#line 257 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 258 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.tval).conditions.clear();
         (yyval.tval).conditions.push_back(Condition((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].cval), (yyvsp[(3) - (3)].tval).values[0]));
@@ -1722,14 +1723,14 @@ yyreduce:
     break;
 
   case 42:
-#line 263 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 264 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.pval) = UNIQUE
     ;}
     break;
 
   case 43:
-#line 266 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 267 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
     {
         (yyval.pval) = NONE;
     ;}
@@ -1737,7 +1738,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1741 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
+#line 1742 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1951,7 +1952,7 @@ yyreturn:
 }
 
 
-#line 271 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
+#line 272 "/Users/orpine/Dropbox/Courses/Database System Design/zbase/yy.y"
 
 
 
