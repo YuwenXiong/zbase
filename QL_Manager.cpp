@@ -282,7 +282,7 @@ RC QL_Manager::Delete(const string &relation, vector<Condition> &conditions) {
                             value = Value(*((float *)recordData + attrs[i].offset));
                             break;
                         case CHARN:
-                            value = Value(*((float *)recordData + attrs[i].offset));
+                            value = Value(recordData + attrs[i].offset);
                             break;
                     }
                     if ((rc = ixIH[i].DeleteEntry(value, rid))) {
