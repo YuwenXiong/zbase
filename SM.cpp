@@ -190,7 +190,7 @@ RC SM_Manager::CreateIndex(const string &relationName, const string &attrName, c
 		return rc;
 	if(attrRecord.indexNo != -1)
 		return SM_INDEXEXISTS;
-	if(attrRecord.property != UNIQUE)
+	if(attrRecord.property == NONE)
 		return SM_NOTUNIQUE;
 	if((rc = attrfh.GetRecord(rid, rec)) != 0)
 		return rc;
@@ -397,7 +397,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 
 		rec.GetData(data);
 
-		if(attrName == ((AttrCatRecordC *)data)->attrName) {
+		if((relationName == ((AttrCatRecordC *)data)->relationName) && (attrName == ((AttrCatRecordC *)data)->attrName)) {
 			isFound = true;
 			break;
 		}
@@ -437,7 +437,7 @@ RC SM_Manager::GetAttrInfo(const string &relationName, const string &attrName, A
 
 		rec.GetData(data);
 
-		if(attrName == ((AttrCatRecordC *)data)->attrName) {
+		if((relationName == ((AttrCatRecordC *)data)->relationName) && (attrName == ((AttrCatRecordC *)data)->attrName)) {
 			rec.GetRid(rid);
 			isFound = true;
 			break;
