@@ -32,7 +32,7 @@ RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
         return rc;
     }
     for (auto &x: attrs) {
-        cout<< setw(12)  << x.attrName;
+        cout<< setw(20)  << x.attrName;
     }
     cout << endl;
 
