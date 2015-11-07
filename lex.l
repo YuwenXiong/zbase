@@ -174,9 +174,9 @@ int checkToken(string s) {
         return T_KEY;
     if (s == "on")
         return T_ON;
-    if (s == "exit")
+    if (s == "quit")
         return T_EXIT;
-    if (s == "exec")
+    if (s == "execfile")
         return T_EXECFILE;
 
     yylval.sval = bs;
