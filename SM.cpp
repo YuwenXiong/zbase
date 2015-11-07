@@ -61,14 +61,17 @@ RC SM_Manager::CreateTable(const string &relationName, const vector<AttrInfo> &a
 		attrRecord.attrName = attrs[i].attrName;
 		attrRecord.offset = size;
 		attrRecord.attrType = attrs[i].attrType;
-		attrRecord.attrLength = attrs[i].attrLength;
+		if(attrRecord.attrType == CHARN)
+			attrRecord.attrLength = attrs[i].attrLength + 1;
+		else
+			attrRecord.attrLength = attrs[i].attrLength;
 		attrRecord.property = attrs[i].property;
 		attrRecord.indexNo = -1;
 		attrRecord.x = i;
 		AttrCatRecordC temp(attrRecord);
 		if((rc = attrfh.InsertRecord((char*)&temp, rid)) != 0)
 			return rc;
-		size += attrs[i].attrLength;
+		size += attrRecord.attrLength;
 	}
 
 	if((rc = rmm.CreateFile(relationName, size)) != 0)
