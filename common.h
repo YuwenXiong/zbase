@@ -29,7 +29,6 @@ struct State {
     string relationName;
     string indexName;
     string attrName;
-    string pAttrName;
     vector<AttrInfo> attrs;
     vector<Value> values;
     vector<Condition> conditions;

@@ -62,57 +62,57 @@ RC PF_FileHandle::GetThisPage(PageNum pageNum, PF_PageHandle &pageHandle) const 
     return RC_OK;
 }
 
-RC PF_FileHandle::GetNextPage(PageNum current, PF_PageHandle &pageHandle) const {
-    int rc;
-    if (!fileOpen) {
-        return PF_FILE_CLOSED;
-    }
-    // here we cannot check current+1 directly because we throw PF_INVALID_PAGE
-    // current = -1 means we want to get the first page
-    if (current != -1 && !IsValidPageNum(current)) {
-        return PF_INVALID_PAGE;
-    }
-    for (current++; current < header.numPages; current++) {
-        if (!(rc = GetThisPage(current, pageHandle))) {
-            return RC_OK;
-        }
-
-        if (rc != PF_INVALID_PAGE) {
-            return rc;
-        }
-    }
-    return PF_EOF;
-}
-
-RC PF_FileHandle::GetPrevPage(PageNum current, PF_PageHandle &pageHandle) const {
-    int rc;
-    if (!fileOpen) {
-        return PF_FILE_CLOSED;
-    }
-    // here we cannot check current-1 directly because we throw PF_INVALID_PAGE
-    // current = header.numPages means we want to get the last page
-    if (current != header.numPages) {
-        return PF_INVALID_PAGE;
-    }
-    for (current--; current >= 0; current--) {
-        if (!(rc = GetThisPage(current, pageHandle))) {
-            return RC_OK;
-        }
-
-        if (rc != PF_INVALID_PAGE) {
-            return rc;
-        }
-    }
-    return PF_EOF;
-}
-
-RC PF_FileHandle::GetFirstPage(PF_PageHandle &pageHandle) const {
-    return GetNextPage(-1, pageHandle);
-}
-
-RC PF_FileHandle::GetLastPage(PF_PageHandle &pageHandle) const {
-    return GetPrevPage(header.numPages, pageHandle);
-}
+//RC PF_FileHandle::GetNextPage(PageNum current, PF_PageHandle &pageHandle) const {
+//    int rc;
+//    if (!fileOpen) {
+//        return PF_FILE_CLOSED;
+//    }
+//    // here we cannot check current+1 directly because we throw PF_INVALID_PAGE
+//    // current = -1 means we want to get the first page
+//    if (current != -1 && !IsValidPageNum(current)) {
+//        return PF_INVALID_PAGE;
+//    }
+//    for (current++; current < header.numPages; current++) {
+//        if (!(rc = GetThisPage(current, pageHandle))) {
+//            return RC_OK;
+//        }
+//
+//        if (rc != PF_INVALID_PAGE) {
+//            return rc;
+//        }
+//    }
+//    return PF_EOF;
+//}
+//
+//RC PF_FileHandle::GetPrevPage(PageNum current, PF_PageHandle &pageHandle) const {
+//    int rc;
+//    if (!fileOpen) {
+//        return PF_FILE_CLOSED;
+//    }
+//    // here we cannot check current-1 directly because we throw PF_INVALID_PAGE
+//    // current = header.numPages means we want to get the last page
+//    if (current != header.numPages) {
+//        return PF_INVALID_PAGE;
+//    }
+//    for (current--; current >= 0; current--) {
+//        if (!(rc = GetThisPage(current, pageHandle))) {
+//            return RC_OK;
+//        }
+//
+//        if (rc != PF_INVALID_PAGE) {
+//            return rc;
+//        }
+//    }
+//    return PF_EOF;
+//}
+//
+//RC PF_FileHandle::GetFirstPage(PF_PageHandle &pageHandle) const {
+//    return GetNextPage(-1, pageHandle);
+//}
+//
+//RC PF_FileHandle::GetLastPage(PF_PageHandle &pageHandle) const {
+//    return GetPrevPage(header.numPages, pageHandle);
+//}
 
 RC PF_FileHandle::AllocatePage(PF_PageHandle &pageHandle) {
     int rc;

@@ -121,7 +121,7 @@ void parser() {
                     }
                     break;
                 case SELECT:
-                    if ((rc = qlm.Select(parseState.attrs, parseState.relationName, parseState.conditions))) {
+                    if ((rc = qlm.Select(parseState.relationName, parseState.conditions))) {
                         switch (rc) {
                             case SM_NOTFOUND: {
                                 printf("Table '%s' not found!\n", parseState.relationName.c_str());

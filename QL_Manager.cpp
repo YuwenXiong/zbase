@@ -16,7 +16,7 @@ QL_Manager::QL_Manager(SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm) {
 QL_Manager::~QL_Manager() { }
 
 // actually we would query all attrs and only one relation
-RC QL_Manager::Select(vector <AttrInfo> &selectAttrs, const string &relation,
+RC QL_Manager::Select(const string &relation,
                       const vector <Condition> &conditions) {
     RC rc;
     RelationCatRecord rcRecord;

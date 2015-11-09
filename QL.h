@@ -26,7 +26,7 @@ class QL_Manager {
 public:
     QL_Manager(SM_Manager &smm, IX_Manager &ixm, RM_Manager &rmm);
     ~QL_Manager();
-    RC Select(vector<AttrInfo> &selectAttrs, const string &relations, const vector<Condition> &conditions);
+    RC Select(const string &relations, const vector<Condition> &conditions);
     RC Insert(const string &relation, const vector<Value> &values);
     RC Delete(const string &relation, vector<Condition> &conditions);
 private:

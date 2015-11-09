@@ -27,9 +27,9 @@ const size_t PF_PAGE_SIZE = 4096 - sizeof(PF_PageHeader);
 const size_t PF_FILE_HEADER_SIZE = PF_PAGE_SIZE + sizeof(PF_PageHeader);
 
 // bufferSize is the number of pages in buffer
-const int PF_BUFFER_SIZE = 40000;
+const int PF_BUFFER_SIZE = 4000;
 // hashTableSize is the size of hash table;
-const int PF_HASH_TABLE_SIZE = 20;
+const int PF_HASH_TABLE_SIZE = 2000;
 
 const int PF_PAGE_LIST_END = -1;
 const int PF_PAGE_USED = -2;
@@ -65,11 +65,6 @@ public:
     PF_FileHandle (const PF_FileHandle &fileHandle);
     PF_FileHandle& operator= (const PF_FileHandle &fileHandle);
 
-    RC GetFirstPage(PF_PageHandle &pageHandle) const;
-    RC GetLastPage(PF_PageHandle &pageHandle) const;
-
-    RC GetNextPage(PageNum current, PF_PageHandle &pageHandle) const;
-    RC GetPrevPage(PageNum current, PF_PageHandle &pageHandle) const;
     RC GetThisPage(PageNum pageNum, PF_PageHandle &pageHandle) const;
 
     RC AllocatePage(PF_PageHandle &pageHandle);

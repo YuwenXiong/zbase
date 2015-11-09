@@ -33,12 +33,7 @@ public:
 private:
     int numBuckets;
     std::vector<PF_HashEntry> hashTable;
-//    std::map<unsigned long, int> fdm;
     int Hash(FILE* fd, PageNum pageNum) const {
-//        if (fdm.find((unsigned long)fd & 0xffff) == fdm.end()) {
-//            fdm[(unsigned long)fd & 0xffff] = rand() % numBuckets;
-////            fdm.insert(std::make_pair(, ));
-//        }
         return (int)(((unsigned long)fd & 0xffff) + pageNum) % numBuckets;
     }
 };
