@@ -2,6 +2,7 @@
 
 *.iml
 *.o
+parser.cpp
 PF_TEST.cpp
 CMakeFiles/
 Makefile
