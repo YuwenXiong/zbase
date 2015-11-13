@@ -48,4 +48,4 @@ optional:
 - Index Manager
 
 ### dqm
-- Catalog Manager
+- System Manager
