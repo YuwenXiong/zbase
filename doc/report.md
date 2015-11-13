@@ -1,6 +1,6 @@
 # <center>MiniSQL设计报告</center>
 
-<br /><br />
+<br />
 
 <center>**小组成员**</center>
 
@@ -9,6 +9,8 @@
 <center>zax</center>
 
 <center>dqm</center>
+
+<br />
 
 ## 实验目的
 
